@@ -1,4 +1,4 @@
-import { validWeather, type WeatherReading } from '../src/weather.ts';
+import type { WeatherReading } from '../src/weather.ts';
 // Grenoble city forecast; this endpoint never accepts arbitrary remote URLs or user locations.
 export async function GET() {
   try {
@@ -25,7 +25,17 @@ export async function GET() {
       fetchedAt: new Date().toISOString(),
       source: 'MET Norway',
     };
-    if (!validWeather(reading)) throw new Error('Invalid weather response');
+    // Keep this deployment entry point self-contained: shared frontend TS modules
+    // are not runtime dependencies of the Vercel function bundle.
+    if (
+      !Number.isFinite(reading.temperature) ||
+      reading.temperature < -60 ||
+      reading.temperature > 60 ||
+      typeof reading.symbol !== 'string' ||
+      reading.symbol.length > 100 ||
+      !Number.isFinite(Date.parse(reading.forecastAt))
+    )
+      throw new Error('Invalid weather response');
     return Response.json(reading, {
       headers: {
         'Cache-Control': 'public, max-age=300, s-maxage=600, stale-while-revalidate=1200',
