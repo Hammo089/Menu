@@ -2,6 +2,8 @@ import { useEffect, useState, type CSSProperties } from 'react';
 import { activeHolidays, holidayCatalog, type HolidaySettings } from './holidays';
 import { SeasonEffect } from './components';
 import type { Season } from './types';
+import { useGrenobleWeather } from './useWeather';
+import { weatherSeason } from './weather';
 function Ornament({ theme, index }: { theme: string; index: number }) {
   if (theme === 'gold')
     return index === 0 ? (
@@ -143,9 +145,13 @@ export default function TVAtmosphere({
     const timer = setInterval(() => setNow(new Date()), 60000);
     return () => clearInterval(timer);
   }, []);
-  return activeHolidays(settings, now).length ? (
+  const festive = activeHolidays(settings, now).length > 0;
+  const weather = useGrenobleWeather(settings.season === 'weather' && !festive);
+  return festive ? (
     <HolidayDecor settings={settings} />
   ) : (
-    <SeasonEffect season={settings.season} />
+    <SeasonEffect
+      season={settings.season === 'weather' ? weatherSeason(weather, now) : settings.season}
+    />
   );
 }

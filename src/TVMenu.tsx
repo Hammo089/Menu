@@ -267,6 +267,16 @@ export default function TVMenu() {
             <br />
             Ces réglages concernent cet écran uniquement.
           </p>
+          {menu.settings.season === 'weather' && (
+            <a
+              className="weather-credit"
+              href="https://www.met.no/en"
+              target="_blank"
+              rel="noreferrer"
+            >
+              Météo : MET Norway · CC BY 4.0
+            </a>
+          )}
           <button
             className="button"
             onClick={() => {

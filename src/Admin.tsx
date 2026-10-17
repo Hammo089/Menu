@@ -26,6 +26,7 @@ import {
 } from 'lucide-react';
 import { useMenu } from './store';
 import HolidayControls from './HolidayControls';
+import TVAtmosphere from './HolidayEffect';
 import { formatPrice, initialMenu, safeImage, supabase, validateMenu } from './lib';
 import { BrandMark, ProductImage, Promotion } from './components';
 import type { Language, MenuState, Product, Settings } from './types';
@@ -935,6 +936,10 @@ export default function Admin() {
                     {[
                       ['none', l('بدون تأثيرات', 'Aucune')],
                       ['auto', l('تلقائي — غرونوبل', 'Automatique — Grenoble')],
+                      [
+                        'weather',
+                        l('حسب طقس غرونوبل — حرارة ومطر وثلج', 'Selon la météo de Grenoble'),
+                      ],
                       ['autumn', l('خريف — ورق خفيف', 'Automne — feuilles')],
                       ['winter', l('شتاء — ثلج', 'Hiver — neige')],
                       ['spring', l('ربيع — زهور', 'Printemps — fleurs')],
@@ -948,20 +953,21 @@ export default function Admin() {
                 </label>
                 <p>
                   {l(
-                    'التأثيرات مطفأة بالبداية حتى تبقى المنيو مطابقة لملفك.',
-                    'Les effets sont désactivés au départ pour préserver votre création.',
+                    'وضع الطقس يختار أجواء دافئة للمشروبات الساخنة وقت البرد، وأجواء منعشة وقت الحر. يتحدث كل ١٠ دقائق، ويرجع للموسم إذا تعذّر الاتصال.',
+                    'Le mode météo choisit une ambiance chaleureuse par temps froid et rafraîchissante par temps chaud. Mise à jour toutes les 10 minutes, avec retour à la saison si les données sont indisponibles.',
                   )}
                 </p>
+                <a
+                  className="weather-credit"
+                  href="https://www.met.no/en"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Météo : MET Norway · CC BY 4.0
+                </a>
                 <div className="season-preview">
-                  {draft.settings.season === 'winter'
-                    ? '❄'
-                    : draft.settings.season === 'autumn'
-                      ? '🍂'
-                      : draft.settings.season === 'summer'
-                        ? '☀'
-                        : draft.settings.season === 'spring'
-                          ? '✿'
-                          : 'Blanco'}
+                  <TVAtmosphere settings={{ ...draft.settings, holidayMode: 'off' }} />
+                  <span>Blanco</span>
                 </div>
               </article>
             </div>

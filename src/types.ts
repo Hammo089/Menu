@@ -9,7 +9,7 @@ export type Product = {
   order: number;
 };
 export type Category = { id: string; name: string; order: number; column: number; image: string };
-export type Season = 'none' | 'auto' | 'autumn' | 'winter' | 'spring' | 'summer';
+export type Season = 'none' | 'auto' | 'weather' | 'autumn' | 'winter' | 'spring' | 'summer';
 export type Settings = HolidaySettings & {
   brandName: string;
   tagline: string;

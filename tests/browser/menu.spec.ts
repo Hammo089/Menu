@@ -1,4 +1,31 @@
 import { test, expect } from '@playwright/test';
+test('weather preview responds to a cold Grenoble forecast and a hot forecast', async ({
+  page,
+}) => {
+  let hot = false;
+  await page.route('**/api/weather', (r) =>
+    r.fulfill({
+      json: {
+        temperature: hot ? 29 : 7,
+        symbol: hot ? 'clearsky_day' : 'rain',
+        forecastAt: new Date().toISOString(),
+        fetchedAt: new Date().toISOString(),
+        source: 'MET Norway',
+      },
+    }),
+  );
+  await page.goto('/admin');
+  await page.getByRole('button', { name: 'الشكل والهوية', exact: true }).click();
+  await page.getByLabel('الموسم', { exact: true }).selectOption('weather');
+  await expect(page.locator('.season-preview .season-effect')).toHaveClass(/winter/);
+  await expect(page.locator('.season-preview .winter-coffee')).toBeVisible();
+  hot = true;
+  await page.getByLabel('الموسم', { exact: true }).selectOption('none');
+  await page.getByLabel('الموسم', { exact: true }).selectOption('weather');
+  await expect(page.locator('.season-preview .season-effect')).toHaveClass(/summer/);
+  await expect(page.locator('.season-preview .summer-parasol')).toHaveCount(3);
+  await expect(page.locator('.season-preview .summer-ice')).toBeVisible();
+});
 test('holiday controls preview a celebration and save calendar choices in the draft', async ({
   page,
 }) => {

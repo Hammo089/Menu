@@ -2671,3 +2671,266 @@ html {
     animation: none;
   }
 }
+/* Photo-based seasonal scenes, sharing one transparent sprite sheet. */
+.natural-sprite {
+  display: block;
+  background-image: url('/effects/natural-seasons.png');
+  background-repeat: no-repeat;
+  background-size: 200% 200%;
+  aspect-ratio: 3/2;
+}
+.sprite-flower {
+  background-position: 0 0;
+}
+.sprite-snow {
+  background-position: 100% 0;
+}
+.sprite-ice {
+  background-position: 0 100%;
+}
+.sprite-parasol {
+  background-position: 100% 100%;
+}
+.season-particle > .natural-sprite {
+  width: 100%;
+  animation: leaf-drift 9s ease-in-out infinite alternate;
+  animation-delay: inherit;
+  filter: drop-shadow(1px 3px 2px #5f6d6e24);
+}
+.season-effect.winter .snow-detailed {
+  opacity: 0.9;
+  filter: none;
+}
+.season-effect.winter .snow-detailed > .sprite-snow {
+  filter: drop-shadow(0 1px 1px #71929c66);
+  animation-duration: 12s;
+}
+.season-effect.winter .season-particle:not(.snow-detailed) {
+  opacity: 0.8;
+}
+.season-effect.winter .season-particle:nth-child(3n):not(.snow-detailed) {
+  filter: blur(1px);
+}
+.spring-corner {
+  position: absolute;
+  width: clamp(120px, 17vw, 245px);
+  opacity: 0.9;
+  filter: drop-shadow(1px 3px 3px #74835f20);
+  animation: blossom-breath 10s ease-in-out infinite alternate;
+}
+.spring-corner.corner-left {
+  top: 0.4%;
+  left: -1%;
+  transform: rotate(-15deg);
+}
+.spring-corner.corner-right {
+  bottom: 0.3%;
+  right: -1%;
+  transform: rotate(160deg);
+  animation-delay: -5s;
+}
+.season-effect.spring .season-particle {
+  opacity: 0.68;
+}
+.season-effect.spring .season-particle > .sprite-flower {
+  animation-duration: 14s;
+}
+.summer-edge-light {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, #f6d17a19, transparent 13% 88%, #f5d17716),
+    linear-gradient(0deg, #b5dfe51c, transparent 14%);
+  pointer-events: none;
+}
+.summer-sun {
+  top: -6%;
+  right: -6%;
+  width: clamp(230px, 27vw, 450px);
+  background: radial-gradient(
+    circle,
+    #fff7d6ff 0 13%,
+    #ffdc6dd4 21%,
+    #f6be4d85 34%,
+    #efb84924 52%,
+    #eebc5300 72%
+  );
+  animation: sun-breath 10s ease-in-out infinite;
+  filter: drop-shadow(0 0 22px #f9da8e77);
+}
+.summer-parasol {
+  position: absolute;
+  width: clamp(85px, 12vw, 185px);
+  height: auto;
+  opacity: 0.9;
+  filter: drop-shadow(2px 4px 3px #6653372b);
+  animation: parasol-breeze 12s ease-in-out infinite alternate;
+}
+.summer-parasol.parasol-0 {
+  left: 1%;
+  top: 2%;
+  transform: rotate(-10deg);
+}
+.summer-parasol.parasol-1 {
+  left: 16%;
+  top: 4%;
+  width: clamp(65px, 9vw, 135px);
+  transform: rotate(8deg);
+  animation-delay: -4s;
+}
+.summer-parasol.parasol-2 {
+  left: auto;
+  right: 4%;
+  top: 8%;
+  width: clamp(75px, 10vw, 160px);
+  transform: rotate(12deg);
+  animation-delay: -8s;
+}
+.summer-ice {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: clamp(145px, 20vw, 285px);
+  filter: drop-shadow(1px 4px 5px #7babb749);
+  opacity: 0.95;
+}
+.summer-cold-mist {
+  position: absolute;
+  bottom: 0;
+  right: -3%;
+  width: 28%;
+  height: 8%;
+  background: radial-gradient(ellipse at bottom, #c3e9f044, transparent 70%);
+  animation: ice-mist 10s ease-in-out infinite alternate;
+}
+.atmosphere-caption {
+  position: absolute;
+  bottom: 2%;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: Georgia, serif;
+  font-size: clamp(13px, 1.7vw, 24px);
+  font-style: italic;
+  white-space: nowrap;
+  padding: 5px 10px;
+  background: #fafafac7;
+  border-radius: 6px;
+}
+.atmosphere-caption.cool {
+  color: #5a8c99;
+}
+.atmosphere-caption.warm {
+  color: #a47740;
+}
+.winter-warm-light {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 8% 100%, #f3bd6c36, transparent 22%),
+    radial-gradient(ellipse at 96% 100%, #e9b16b20, transparent 19%);
+}
+.winter-coffee {
+  position: absolute;
+  bottom: 0.6%;
+  left: 1.5%;
+  width: clamp(75px, 11vw, 160px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  box-shadow: 0 5px 16px #744e2926;
+  border: 3px solid #fff8e8;
+  opacity: 0.92;
+}
+.winter-coffee > img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+.winter-coffee > i {
+  position: absolute;
+  left: 30%;
+  top: -45%;
+  width: 15%;
+  height: 65%;
+  background: radial-gradient(ellipse, #fff8e4a6, transparent 68%);
+  filter: blur(4px);
+  animation: coffee-steam 5s ease-out infinite;
+}
+.winter-coffee > i:nth-of-type(2) {
+  left: 50%;
+  animation-delay: -1.7s;
+}
+.winter-coffee > i:nth-of-type(3) {
+  left: 65%;
+  animation-delay: -3.3s;
+}
+.season-preview {
+  position: relative;
+  overflow: hidden;
+}
+.season-preview > span {
+  z-index: 5;
+  position: relative;
+  pointer-events: none;
+}
+.season-preview .atmosphere-caption {
+  display: none;
+}
+.season-preview .spring-corner {
+  width: 100px;
+}
+.season-preview .summer-sun {
+  width: 140px;
+}
+.season-preview .summer-parasol {
+  width: 65px;
+}
+.season-preview .summer-ice {
+  width: 95px;
+}
+.season-preview .winter-coffee {
+  width: 55px;
+}
+.weather-credit {
+  font-size: 10px;
+  color: #85977b;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+@keyframes blossom-breath {
+  from {
+    opacity: 0.82;
+  }
+  to {
+    opacity: 0.98;
+  }
+}
+@keyframes parasol-breeze {
+  from {
+    rotate: -2deg;
+  }
+  to {
+    rotate: 2deg;
+  }
+}
+@keyframes ice-mist {
+  from {
+    opacity: 0.45;
+  }
+  to {
+    opacity: 0.85;
+  }
+}
+@keyframes coffee-steam {
+  0% {
+    opacity: 0;
+    transform: translate(0, 12px) scale(0.8);
+  }
+  30% {
+    opacity: 0.7;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(12px, -30px) scale(1.4);
+  }
+}

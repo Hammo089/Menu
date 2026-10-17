@@ -69,7 +69,9 @@ export function validateMenu(value: unknown): value is MenuState {
       /^#[0-9a-f]{6}$/i.test(m.settings.background) &&
       /^#[0-9a-f]{6}$/i.test(m.settings.textColor) &&
       /^#[0-9a-f]{6}$/i.test(m.settings.tvBackground) &&
-      ['none', 'auto', 'autumn', 'winter', 'spring', 'summer'].includes(m.settings.season) &&
+      ['none', 'auto', 'weather', 'autumn', 'winter', 'spring', 'summer'].includes(
+        m.settings.season,
+      ) &&
       validHolidaySettings(m.settings) &&
       typeof m.settings.adsEnabled === 'boolean' &&
       Number.isFinite(m.settings.tvScale) &&

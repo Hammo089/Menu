@@ -17,3 +17,7 @@
 Illustrations are not exact product representations. Replace them with Blanco photography in the administration.
 
 Seasonal overlays: `public/effects/autumn-leaf.png` is a generated photorealistic transparent leaf for Blanco. `petal.svg` and `parasol.svg` are original shaded illustrations; winter snow and summer sunlight are rendered with CSS gradients. No emoji are used in the TV seasonal overlays.
+
+`public/effects/natural-seasons.png` is an original generated transparent photographic sprite sheet: spring blossoms (top left), a snow crystal (top right), ice cubes (bottom left), and a fabric parasol (bottom right). CSS displays individual quadrants without duplicating or modifying the source file. The winter coffee vignette uses the existing temporary coffee photograph.
+
+Weather data: Norwegian Meteorological Institute / MET Norway, [Locationforecast](https://api.met.no/weatherapi/locationforecast/2.0/documentation), licensed [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). Attribution is accessible in appearance settings and TV device settings. Data is used to select a visual mood, not to claim snow is falling outside.

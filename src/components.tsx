@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import { X } from 'lucide-react';
 import { formatPrice, safeImage } from './lib';
 import type { Product, Settings, Season } from './types';
+import { calendarSeason } from './weather';
 
 export function BrandMark({
   name = 'Blanco',
@@ -46,22 +47,7 @@ export function ProductImage({
 }
 export function SeasonEffect({ season }: { season: Season }) {
   const layer = useRef<HTMLDivElement>(null);
-  let actual = season;
-  if (season === 'auto') {
-    const month = Number(
-      new Intl.DateTimeFormat('fr-FR', { month: 'numeric', timeZone: 'Europe/Paris' }).format(
-        new Date(),
-      ),
-    );
-    actual =
-      month >= 9 && month <= 11
-        ? 'autumn'
-        : month === 12 || month <= 2
-          ? 'winter'
-          : month >= 6 && month <= 8
-            ? 'summer'
-            : 'spring';
-  }
+  const actual = season === 'auto' || season === 'weather' ? calendarSeason() : season;
   useEffect(() => {
     const element = layer.current;
     if (!element) return;
@@ -77,39 +63,73 @@ export function SeasonEffect({ season }: { season: Season }) {
     <div ref={layer} className={`season-effect ${actual}`} aria-hidden="true">
       {actual === 'summer' ? (
         <>
+          <div className="summer-edge-light" />
           <div className="summer-sun" />
-          <img className="summer-parasol" src="/effects/parasol.svg" alt="" />
+          {[0, 1, 2].map((i) => (
+            <div key={i} className={`natural-sprite sprite-parasol summer-parasol parasol-${i}`} />
+          ))}
+          <div className="summer-cold-mist" />
+          <div className="natural-sprite sprite-ice summer-ice" />
+          <span className="atmosphere-caption cool">Envie de fraîcheur ?</span>
         </>
       ) : (
-        Array.from({ length: actual === 'winter' ? 24 : 14 }, (_, i) => (
-          <span
-            key={i}
-            className="season-particle"
-            style={
-              {
-                left: `${(i * 37 + 3) % 100}%`,
-                animationDelay: `${i * -2.9}s`,
-                animationDuration: `${20 + (i % 6) * 3}s`,
-                width:
-                  actual === 'winter'
-                    ? `${9 + (i % 4) * 5}px`
-                    : `clamp(36px, ${3.2 + (i % 3) * 0.8}vw, ${60 + (i % 3) * 12}px)`,
-                '--sway': `${i % 2 ? -1 : 1}`,
-                '--turn': `${i * 47}deg`,
-                '--tone': `${(i % 3) * 14 - 10}deg`,
-              } as CSSProperties
-            }
-          >
-            {actual === 'winter' ? (
-              <i className="snow-crystal" />
-            ) : (
-              <img
-                src={actual === 'autumn' ? '/effects/autumn-leaf.png' : '/effects/petal.svg'}
-                alt=""
-              />
-            )}
-          </span>
-        ))
+        <>
+          {actual === 'spring' && (
+            <>
+              <div className="natural-sprite sprite-flower spring-corner corner-left" />
+              <div className="natural-sprite sprite-flower spring-corner corner-right" />
+            </>
+          )}
+          {actual === 'winter' && (
+            <>
+              <div className="winter-warm-light" />
+              <div className="winter-coffee">
+                <img src="/images/coffee.jpg" alt="" />
+                <i />
+                <i />
+                <i />
+              </div>
+              <span className="atmosphere-caption warm">Une pause bien au chaud.</span>
+            </>
+          )}
+          {Array.from(
+            { length: actual === 'winter' ? 40 : actual === 'spring' ? 8 : 14 },
+            (_, i) => (
+              <span
+                key={i}
+                className={`season-particle ${actual === 'winter' && i % 4 === 0 ? 'snow-detailed' : ''}`}
+                style={
+                  {
+                    left: `${(i * 37 + 3) % 100}%`,
+                    animationDelay: `${i * -2.9}s`,
+                    animationDuration: `${actual === 'winter' ? 12 + (i % 6) * 3 : 22 + (i % 6) * 3}s`,
+                    width:
+                      actual === 'winter'
+                        ? i % 4 === 0
+                          ? `clamp(30px,3.4vw,56px)`
+                          : `${4 + (i % 4) * 3}px`
+                        : `clamp(36px,${3.2 + (i % 3) * 0.8}vw,${60 + (i % 3) * 12}px)`,
+                    '--sway': `${i % 2 ? -1 : 1}`,
+                    '--turn': `${i * 47}deg`,
+                    '--tone': `${(i % 3) * 14 - 10}deg`,
+                  } as CSSProperties
+                }
+              >
+                {actual === 'winter' ? (
+                  i % 4 === 0 ? (
+                    <i className="natural-sprite sprite-snow" />
+                  ) : (
+                    <i className="snow-crystal" />
+                  )
+                ) : actual === 'spring' ? (
+                  <i className="natural-sprite sprite-flower" />
+                ) : (
+                  <img src="/effects/autumn-leaf.png" alt="" />
+                )}
+              </span>
+            ),
+          )}
+        </>
       )}
     </div>
   );

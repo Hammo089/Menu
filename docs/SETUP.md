@@ -86,3 +86,11 @@ Les occasions musulmanes suivent le calendrier prévisionnel Umm al-Qura : Ramad
 Ramadan dure le mois calculé ; l’Aïd el-Fitr trois jours, l’Aïd el-Adha quatre jours. Noël commence cinq jours avant et finit le lendemain ; Pâques couvre la veille, le jour et le lendemain. Les autres fêtes sont affichées le jour indiqué (Pentecôte et nouvel an incluent le lendemain ; le nouvel an inclut aussi le 31 décembre). Les dates sont évaluées selon Europe/Paris et revérifiées chaque minute. La décoration festive remplace temporairement l’effet saisonnier. Les publicités restent disponibles.
 
 Ce calendrier regroupe les principales occasions sélectionnées pour Blanco ; il ne prétend pas couvrir chaque fête de toutes les confessions. Les décorations ne nécessitent aucun service externe. Les réglages et corrections ne sont publiés qu’après « Publier les modifications ».
+
+## Ambiance selon la météo
+
+Identité & style → Saison → « Selon la météo de Grenoble » choisit une ambiance à partir de la prévision horaire de Grenoble (45.1885, 5.7245). Il s’agit d’un choix d’ambiance pour le café, pas d’une représentation littérale du ciel extérieur : le froid, la neige ou une pluie fraîche favorisent un décor hivernal chaleureux ; la chaleur favorise soleil, parasols et glaçons. Les fleurs et les feuilles correspondent aux périodes plus douces.
+
+`/api/weather` est une Vercel Function GET sans clé API. Elle consulte uniquement l’API publique de MET Norway avec un User-Agent identifié et un délai de 8 secondes. La réponse est mise en cache par le CDN pendant 10 minutes. Les écrans la consultent toutes les 10 minutes et conservent temporairement la dernière lecture. Les données reçues depuis plus de 90 minutes, les prévisions trop anciennes et les erreurs déclenchent le retour à la saison du calendrier. Le mode fonctionne après déploiement sur Vercel ; Vite seul ne sert pas la fonction API. Les tests du navigateur utilisent une réponse météo contrôlée.
+
+Les effets saisonniers manuels et le mode automatique par mois restent disponibles. Les fêtes gardent leur priorité. La préférence d’accessibilité « Réduire les animations » masque les effets saisonniers.
