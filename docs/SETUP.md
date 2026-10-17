@@ -76,3 +76,13 @@ Sans ces deux variables, la carte d’origine est visible et `/admin` propose un
 4. Activez une publicité, attendez un intervalle complet et vérifiez sa disparition.
 5. Vérifiez qu’un visiteur non connecté ne peut pas publier et qu’un compte non autorisé n’accède pas à l’administration.
 6. Testez l’orientation sur le téléviseur physique : l’émulation navigateur ne remplace pas cette vérification.
+
+## Fêtes et calendriers
+
+Dans Identité & style, les fêtes peuvent être automatiques, désactivées, ou sélectionnées manuellement. Les calendriers occidental et orthodoxe julien sont activés ensemble par défaut. Noël oriental est fixé au 7 janvier, l’Épiphanie au 19 janvier et la Dormition au 28 août ; certaines Églises orientales utilisent d’autres dates, modifiables dans le calendrier. Pâques, les Rameaux, l’Ascension et la Pentecôte sont calculés séparément pour chaque tradition. Les dates communes ne produisent pas de doublon.
+
+Les occasions musulmanes suivent le calendrier prévisionnel Umm al-Qura : Ramadan, Aïd el-Fitr, Aïd el-Adha, nouvel an hégirien, Mawlid, Al-Isra wal-Miraj et Achoura. Un ajustement de −2 à +2 jours et des dates individuelles permettent de suivre l’annonce locale du croissant. Une date individuelle remplace l’ajustement global pour cette occurrence.
+
+Ramadan dure le mois calculé ; l’Aïd el-Fitr trois jours, l’Aïd el-Adha quatre jours. Noël commence cinq jours avant et finit le lendemain ; Pâques couvre la veille, le jour et le lendemain. Les autres fêtes sont affichées le jour indiqué (Pentecôte et nouvel an incluent le lendemain ; le nouvel an inclut aussi le 31 décembre). Les dates sont évaluées selon Europe/Paris et revérifiées chaque minute. La décoration festive remplace temporairement l’effet saisonnier. Les publicités restent disponibles.
+
+Ce calendrier regroupe les principales occasions sélectionnées pour Blanco ; il ne prétend pas couvrir chaque fête de toutes les confessions. Les décorations ne nécessitent aucun service externe. Les réglages et corrections ne sont publiés qu’après « Publier les modifications ».

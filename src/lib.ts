@@ -1,6 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 import rawMenu from './data/menu.json';
 import type { MenuState } from './types';
+import { validHolidaySettings } from './holidays';
 
 export const initialMenu = rawMenu as MenuState;
 const url = import.meta.env.VITE_SUPABASE_URL;
@@ -69,6 +70,7 @@ export function validateMenu(value: unknown): value is MenuState {
       /^#[0-9a-f]{6}$/i.test(m.settings.textColor) &&
       /^#[0-9a-f]{6}$/i.test(m.settings.tvBackground) &&
       ['none', 'auto', 'autumn', 'winter', 'spring', 'summer'].includes(m.settings.season) &&
+      validHolidaySettings(m.settings) &&
       typeof m.settings.adsEnabled === 'boolean' &&
       Number.isFinite(m.settings.tvScale) &&
       m.settings.tvScale >= 0.5 &&

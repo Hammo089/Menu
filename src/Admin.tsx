@@ -25,6 +25,7 @@ import {
   X,
 } from 'lucide-react';
 import { useMenu } from './store';
+import HolidayControls from './HolidayControls';
 import { formatPrice, initialMenu, safeImage, supabase, validateMenu } from './lib';
 import { BrandMark, ProductImage, Promotion } from './components';
 import type { Language, MenuState, Product, Settings } from './types';
@@ -964,6 +965,9 @@ export default function Admin() {
                 </div>
               </article>
             </div>
+          )}
+          {tab === 'appearance' && (
+            <HolidayControls settings={draft.settings} onChange={changeSettings} lang={lang} />
           )}
           {tab === 'television' && (
             <div className="settings-grid">

@@ -3,7 +3,8 @@ import { Maximize, Minimize, Settings2, X } from 'lucide-react';
 import originalSvg from './data/original-menu.svg?raw';
 import { initialMenu, originalPrice } from './lib';
 import { useMenu } from './store';
-import { Promotion, SeasonEffect } from './components';
+import { Promotion } from './components';
+import TVAtmosphere from './HolidayEffect';
 import type { MenuState, Settings } from './types';
 
 export function renderTvSvg(menu: MenuState) {
@@ -203,7 +204,7 @@ export default function TVMenu() {
           style={{ transform: `scale(${menu.settings.tvScale})` }}
           dangerouslySetInnerHTML={{ __html: svg }}
         />
-        <SeasonEffect season={menu.settings.season} />
+        <TVAtmosphere settings={menu.settings} />
         <Promotion products={menu.products} settings={menu.settings} />
       </div>
       <div

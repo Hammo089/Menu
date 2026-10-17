@@ -546,6 +546,10 @@
     "currency": "EUR",
     "timezone": "Europe/Paris",
     "tvOrientation": "portrait",
-    "tvRotation": 0
+    "tvRotation": 0,
+    "holidayMode": "auto",
+    "holidayCalendar": "both",
+    "holidayOffsetDays": 0,
+    "holidayOverrides": {}
   }
 }

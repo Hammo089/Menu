@@ -1,3 +1,4 @@
+import type { HolidaySettings } from './holidays';
 export type Product = {
   id: string;
   categoryId: string;
@@ -9,7 +10,7 @@ export type Product = {
 };
 export type Category = { id: string; name: string; order: number; column: number; image: string };
 export type Season = 'none' | 'auto' | 'autumn' | 'winter' | 'spring' | 'summer';
-export type Settings = {
+export type Settings = HolidaySettings & {
   brandName: string;
   tagline: string;
   accent: string;

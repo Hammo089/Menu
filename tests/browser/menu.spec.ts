@@ -1,4 +1,19 @@
 import { test, expect } from '@playwright/test';
+test('holiday controls preview a celebration and save calendar choices in the draft', async ({
+  page,
+}) => {
+  await page.goto('/admin');
+  await page.getByRole('button', { name: 'الشكل والهوية', exact: true }).click();
+  await page.getByRole('button', { name: 'معاينة رمضان', exact: true }).click();
+  await expect(page.getByRole('dialog')).toBeVisible();
+  await expect(page.locator('.holiday-effect')).toHaveAttribute('data-holiday', 'ramadan');
+  await page.getByRole('button', { name: 'إغلاق', exact: true }).click();
+  await page.getByLabel('وضع الأعياد').selectOption('christmas');
+  await page.getByLabel('التقويم المسيحي').selectOption('both');
+  await page.getByLabel('تصحيح التواريخ الهجرية').selectOption('1');
+  await expect(page.getByText('تعديلات غير منشورة', { exact: true })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'نشر التعديلات', exact: true })).toBeDisabled();
+});
 test('customer menu contains all original products, supports search, and fits a phone', async ({
   page,
 }) => {
