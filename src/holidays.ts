@@ -15,6 +15,7 @@ export const holidayCatalog = {
   assumption: ['عيد انتقال العذراء', 'Assomption / Dormition', 'blossom'],
   allsaints: ['عيد جميع القديسين', 'Toussaint', 'lights'],
   newyear: ['رأس السنة الميلادية', 'Bonne année', 'lights'],
+  halloween: ['الهالوين', 'Joyeux Halloween', 'halloween'],
 } as const;
 export type HolidayId = keyof typeof holidayCatalog;
 export type HolidayCalendar = 'western' | 'eastern' | 'both';
@@ -110,6 +111,7 @@ export function holidaySchedule(year: number, calendar: HolidayCalendar = 'both'
       key: `${id}:${tradition}:${date}`,
     });
   add('newyear', `${year}-01-01`, 'shared', 1, 1, 85);
+  add('halloween', `${year}-10-31`, 'shared', 7, 0, 80);
   for (const tradition of ['western', 'eastern'] as const) {
     if (calendar !== 'both' && calendar !== tradition) continue;
     const east = tradition === 'eastern',

@@ -21,3 +21,5 @@ Seasonal overlays: `public/effects/autumn-leaf.png` is a generated photorealisti
 `public/effects/natural-seasons.png` is an original generated transparent photographic sprite sheet: spring blossoms (top left), a snow crystal (top right), ice cubes (bottom left), and a fabric parasol (bottom right). CSS displays individual quadrants without duplicating or modifying the source file. The winter coffee vignette uses the existing temporary coffee photograph.
 
 Weather data: Norwegian Meteorological Institute / MET Norway, [Locationforecast](https://api.met.no/weatherapi/locationforecast/2.0/documentation), licensed [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). Attribution is accessible in appearance settings and TV device settings. Data is used to select a visual mood, not to claim snow is falling outside.
+
+`public/effects/festive-scenes.png` is an original generated transparent photographic sprite sheet for the café’s holiday scenes: Santa figurine (top left), decorated Christmas tree (top right), illuminated pumpkin (bottom left), and decorative bat (bottom right). CSS selects quadrants without modifying the source image.

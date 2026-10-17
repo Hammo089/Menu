@@ -94,3 +94,9 @@ Identité & style → Saison → « Selon la météo de Grenoble » choisit une 
 `/api/weather` est une Vercel Function GET sans clé API. Elle consulte uniquement l’API publique de MET Norway avec un User-Agent identifié et un délai de 8 secondes. La réponse est mise en cache par le CDN pendant 10 minutes. Les écrans la consultent toutes les 10 minutes et conservent temporairement la dernière lecture. Les données reçues depuis plus de 90 minutes, les prévisions trop anciennes et les erreurs déclenchent le retour à la saison du calendrier. Le mode fonctionne après déploiement sur Vercel ; Vite seul ne sert pas la fonction API. Les tests du navigateur utilisent une réponse météo contrôlée.
 
 Les effets saisonniers manuels et le mode automatique par mois restent disponibles. Les fêtes gardent leur priorité. La préférence d’accessibilité « Réduire les animations » masque les effets saisonniers.
+
+## Halloween et Noël
+
+Halloween figure dans le sélecteur et le calendrier des dates : en automatique, le décor s’affiche du 24 au 31 octobre (inclus). Les dates individuelles restent modifiables. Il utilise deux citrouilles éclairées, trois petites chauves-souris et une lumière ambrée douce, sans obscurcir la carte.
+
+Noël conserve les dates des deux calendriers choisis : le décor comprend un Père Noël miniature, un sapin décoré, une guirlande, des lumières chaudes et quelques flocons. Les décorations restent dans les coins. Le mode manuel permet de préparer l’ambiance en avance ; le bouton d’aperçu ne publie aucun changement. Les animations respectent « Réduire les animations ».

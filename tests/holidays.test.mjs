@@ -8,6 +8,14 @@ import {
   validHolidaySettings,
 } from '../src/holidays.ts';
 const noon = (date) => new Date(`${date}T12:00:00Z`);
+test('Halloween ambience runs October 24–31 and yields to All Saints on November 1', () => {
+  assert.ok(!activeHolidays({}, noon('2026-10-23')).some((e) => e.id === 'halloween'));
+  assert.equal(activeHolidays({}, noon('2026-10-24'))[0].id, 'halloween');
+  assert.equal(activeHolidays({}, noon('2026-10-31'))[0].id, 'halloween');
+  assert.ok(!activeHolidays({}, noon('2026-11-01')).some((e) => e.id === 'halloween'));
+  assert.equal(activeHolidays({}, noon('2026-11-01'))[0].id, 'allsaints');
+  assert.equal(activeHolidays({ holidayMode: 'halloween' }, noon('2026-08-01'))[0].id, 'halloween');
+});
 test('Western and Julian Orthodox Easter use their own dates and converge in shared years', () => {
   assert.equal(easterDate(2026), '2026-04-05');
   assert.equal(easterDate(2026, true), '2026-04-12');

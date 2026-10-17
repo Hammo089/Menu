@@ -112,14 +112,54 @@ export function HolidayDecor({ settings }: { settings: HolidaySettings }) {
   if (!active.length) return null;
   const [event] = active,
     theme = holidayCatalog[event.id][2];
+  const christmas = event.id === 'christmas';
+  const halloween = event.id === 'halloween';
   return (
     <div className={`holiday-effect holiday-${theme}`} data-holiday={event.id} aria-hidden="true">
-      <div className="holiday-ornament left">
-        <Ornament theme={theme} index={0} />
-      </div>
-      <div className="holiday-ornament right">
-        <Ornament theme={theme} index={1} />
-      </div>
+      {halloween ? (
+        <div className="halloween-edge-glow" />
+      ) : (
+        <>
+          <div className="holiday-ornament left">
+            <Ornament theme={theme} index={0} />
+          </div>
+          <div className="holiday-ornament right">
+            <Ornament theme={theme} index={1} />
+          </div>
+        </>
+      )}
+      {christmas && (
+        <>
+          <div className="christmas-warmth" />
+          <div className="festive-photo photo-santa christmas-santa" />
+          <div className="festive-photo photo-tree christmas-tree" />
+          <div className="christmas-garland" />
+          {Array.from({ length: 14 }, (_, i) => (
+            <i
+              key={i}
+              className="christmas-snow"
+              style={
+                {
+                  left: `${(i * 29 + 4) % 100}%`,
+                  animationDelay: `${-i * 2.7}s`,
+                  animationDuration: `${22 + (i % 5) * 4}s`,
+                } as CSSProperties
+              }
+            />
+          ))}
+        </>
+      )}
+      {halloween && (
+        <>
+          <div className="festive-photo photo-pumpkin halloween-pumpkin pumpkin-left" />
+          <div className="festive-photo photo-pumpkin halloween-pumpkin pumpkin-right" />
+          {[0, 1, 2].map((i) => (
+            <div key={i} className={`halloween-bat-flight bat-${i}`}>
+              <i className="festive-photo photo-bat" />
+            </div>
+          ))}
+        </>
+      )}
       <div className="holiday-greeting">
         {active
           .slice(0, 2)

@@ -2934,3 +2934,204 @@ html {
     transform: translate(12px, -30px) scale(1.4);
   }
 }
+/* Friendly cafe holiday scenes: photographic props stay in the clear corners. */
+.festive-photo {
+  display: block;
+  aspect-ratio: 3/2;
+  background-image: url('/effects/festive-scenes.png');
+  background-size: 200% 200%;
+  background-repeat: no-repeat;
+  filter: drop-shadow(1px 3px 3px #4d422927);
+}
+.photo-santa {
+  background-position: 0 0;
+}
+.photo-tree {
+  background-position: 100% 0;
+}
+.photo-pumpkin {
+  background-position: 0 100%;
+}
+.photo-bat {
+  background-position: 100% 100%;
+}
+.christmas-santa {
+  position: absolute;
+  bottom: 0.1%;
+  left: -2%;
+  width: clamp(155px, 22vw, 315px);
+  transform-origin: bottom center;
+  animation: santa-greeting 7s ease-in-out infinite;
+}
+.christmas-tree {
+  position: absolute;
+  bottom: 0;
+  right: -1%;
+  width: clamp(155px, 22vw, 320px);
+  filter: drop-shadow(0 0 8px #e5c78044);
+}
+.christmas-warmth {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 8% 100%, #f2c58a28, transparent 17%),
+    radial-gradient(ellipse at 92% 100%, #e7d7b52b, transparent 18%);
+}
+.christmas-garland {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -2px;
+  height: 11px;
+  background: repeating-linear-gradient(125deg, #55704d 0 4px, #7b8e65 4px 7px, #415e42 7px 11px);
+  opacity: 0.75;
+  border-radius: 0 0 45% 45%;
+  box-shadow: 0 3px 8px #77936319;
+}
+.christmas-snow {
+  position: absolute;
+  top: -3%;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #f4f8f8;
+  box-shadow: 0 0 2px #afc4c9;
+  opacity: 0.65;
+  animation: festive-snow 30s linear infinite;
+  pointer-events: none;
+}
+.holiday-evergreen .holiday-lights > i {
+  width: 7px;
+  height: 7px;
+  top: 1.1%;
+  background: #f3d797;
+  box-shadow: 0 0 9px 3px #edca7c88;
+  animation-duration: 5s;
+}
+.holiday-evergreen .holiday-lights > i:nth-child(3n) {
+  background: #b97769;
+  box-shadow: 0 0 9px #cc817555;
+}
+.holiday-halloween {
+  color: #9b682e;
+}
+.holiday-halloween .holiday-greeting {
+  color: #a1692c;
+}
+.holiday-halloween .holiday-lights > i {
+  background: #e7b464;
+  box-shadow: 0 0 10px 2px #e9b16c66;
+}
+.halloween-edge-glow {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 2% 100%, #e8a34b26, transparent 18%),
+    radial-gradient(ellipse at 98% 100%, #dda86b1c, transparent 16%);
+}
+.halloween-pumpkin {
+  position: absolute;
+  bottom: 0.2%;
+  width: clamp(130px, 19vw, 275px);
+  filter: drop-shadow(0 0 9px #d68b3542);
+  animation: pumpkin-glow 7s ease-in-out infinite alternate;
+}
+.pumpkin-left {
+  left: -1%;
+}
+.pumpkin-right {
+  right: -1%;
+  width: clamp(110px, 16vw, 225px);
+  transform: scaleX(-1);
+  animation-delay: -3s;
+}
+.halloween-bat-flight {
+  position: absolute;
+  top: 3%;
+  left: 5%;
+  width: clamp(45px, 7vw, 105px);
+  animation: bat-drift 22s ease-in-out infinite alternate;
+  opacity: 0.72;
+}
+.halloween-bat-flight > .photo-bat {
+  width: 100%;
+  animation: bat-wings 2.6s ease-in-out infinite alternate;
+  filter: drop-shadow(0 2px 2px #443c3824);
+}
+.halloween-bat-flight.bat-1 {
+  left: 40%;
+  top: 1%;
+  width: clamp(33px, 5vw, 75px);
+  animation-delay: -9s;
+}
+.halloween-bat-flight.bat-2 {
+  left: auto;
+  right: 8%;
+  top: 5%;
+  animation-delay: -15s;
+}
+.holiday-preview-frame .christmas-santa,
+.holiday-preview-frame .christmas-tree {
+  width: 140px;
+}
+.holiday-preview-frame .halloween-pumpkin {
+  width: 120px;
+}
+.holiday-preview-frame .halloween-bat-flight {
+  width: 45px;
+}
+@keyframes santa-greeting {
+  0%,
+  100% {
+    transform: rotate(-2deg) translateY(0);
+  }
+  50% {
+    transform: rotate(2deg) translateY(-3px);
+  }
+}
+@keyframes pumpkin-glow {
+  from {
+    filter: drop-shadow(0 0 5px #d68b3533);
+  }
+  to {
+    filter: drop-shadow(0 0 12px #d68b3566);
+  }
+}
+@keyframes bat-drift {
+  from {
+    transform: translate(0, 0);
+  }
+  to {
+    transform: translate(45px, 15px);
+  }
+}
+@keyframes bat-wings {
+  from {
+    transform: scaleY(0.8) rotate(-6deg);
+  }
+  to {
+    transform: scaleY(1) rotate(6deg);
+  }
+}
+@keyframes festive-snow {
+  from {
+    top: -3%;
+    transform: translateX(0);
+  }
+  to {
+    top: 103%;
+    transform: translateX(25px);
+  }
+}
+/* The top-row figures include their complete feet/tree base; gutters are masked below. */
+.photo-santa,
+.photo-tree {
+  aspect-ratio: 768/550;
+  background-size: 200% 186.1818%;
+}
+.photo-pumpkin {
+  clip-path: inset(7% 0 0 0);
+}
+.photo-bat {
+  clip-path: inset(12% 0 0 0);
+}

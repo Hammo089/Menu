@@ -1,4 +1,16 @@
 import { test, expect } from '@playwright/test';
+test('Halloween and Christmas previews display their own festive props', async ({ page }) => {
+  await page.goto('/admin');
+  await page.getByRole('button', { name: 'الشكل والهوية', exact: true }).click();
+  await page.getByRole('button', { name: 'معاينة الهالوين', exact: true }).click();
+  await expect(page.locator('.holiday-effect')).toHaveAttribute('data-holiday', 'halloween');
+  await expect(page.locator('.halloween-pumpkin')).toHaveCount(2);
+  await expect(page.locator('.halloween-bat-flight')).toHaveCount(3);
+  await page.getByRole('button', { name: 'إغلاق', exact: true }).click();
+  await page.getByRole('button', { name: 'معاينة عيد الميلاد', exact: true }).first().click();
+  await expect(page.locator('.christmas-santa')).toBeVisible();
+  await expect(page.locator('.christmas-tree')).toBeVisible();
+});
 test('weather preview responds to a cold Grenoble forecast and a hot forecast', async ({
   page,
 }) => {
