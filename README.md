@@ -4,11 +4,11 @@
 
 Digital menu for Blanco in Grenoble, with a customer menu, a faithful TV version of the supplied artwork, and Arabic/French administration.
 
-| Route | Usage |
-| --- | --- |
-| `/` or `/menu` | Responsive French customer menu with 52 original products, category filters, search and temporary photography |
-| `/tv` | Original vector menu, portrait/landscape selection, local rotation controls, optional center advertisements and seasonal effects |
-| `/admin` | Arabic/French product and price editing, image uploads, categories, appearance, TV settings, ad scheduling, backups and publication |
+| Route          | Usage                                                                                                                               |
+| -------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| `/` or `/menu` | Responsive French customer menu with 52 original products, category filters, search and temporary photography                       |
+| `/tv`          | Original vector menu, portrait/landscape selection, local rotation controls, optional center advertisements and seasonal effects    |
+| `/admin`       | Arabic/French product and price editing, image uploads, categories, appearance, TV settings, ad scheduling, backups and publication |
 
 **React + TypeScript + Vite · Supabase Auth / Postgres / Realtime / Storage · Vercel**
 

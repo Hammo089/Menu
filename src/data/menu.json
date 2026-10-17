@@ -540,9 +540,7 @@
     "adsEnabled": false,
     "adIntervalSeconds": 60,
     "adDurationSeconds": 5,
-    "promotionIds": [
-      "signatures-1"
-    ],
+    "promotionIds": ["signatures-1"],
     "promotionText": "Votre prochaine pause préférée.",
     "promotionLabel": "À DÉCOUVRIR",
     "currency": "EUR",
