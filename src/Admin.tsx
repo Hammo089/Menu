@@ -929,6 +929,7 @@ export default function Admin() {
                   {l('الموسم', 'Saison')}
                   <select
                     value={draft.settings.season}
+                    aria-label={l('الموسم', 'Saison')}
                     onChange={(e) =>
                       changeSettings({ season: e.target.value as Settings['season'] })
                     }
