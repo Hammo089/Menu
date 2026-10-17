@@ -815,29 +815,97 @@ html {
   overflow: hidden;
   z-index: 4;
 }
-.season-effect > span {
+.season-effect {
+  --season-travel: 120vh;
+}
+.season-particle {
   position: absolute;
-  top: -50px;
-  opacity: 0.45;
-  animation: falling 18s linear infinite;
-  color: #9f6534;
-}
-.season-effect.winter > span {
-  color: #c7dfe0;
+  top: -100px;
+  aspect-ratio: 1;
   opacity: 0.8;
-  text-shadow: 0 0 5px #fff;
+  animation: natural-fall 28s linear infinite;
+  will-change: transform;
 }
-.season-effect.spring > span {
-  color: #c4a4ad;
+.season-particle > img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  animation: leaf-drift 7s ease-in-out infinite alternate;
+  animation-delay: inherit;
+  filter: hue-rotate(var(--tone)) drop-shadow(1px 3px 2px #53361b24);
 }
-.season-effect.summer > span {
-  top: 6%;
-  opacity: 0.5;
-  animation: gentle-float 14s ease-in-out infinite;
-  color: #dab660;
+.season-effect.spring .season-particle {
+  opacity: 0.74;
 }
-.season-effect.summer > span:first-child {
-  font-size: 65px !important;
+.season-effect.spring .season-particle > img {
+  filter: drop-shadow(1px 2px 2px #a46b7d20);
+}
+.season-effect.winter .season-particle {
+  opacity: 0.85;
+}
+.snow-crystal {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 35% 30%,
+    #fff 0 15%,
+    #f1f6f7d9 40%,
+    #bdd1d580 70%,
+    #b0c6cb00 100%
+  );
+  box-shadow: 0 0 4px #b3cbd280;
+}
+.season-effect.winter .season-particle:nth-child(3n) {
+  filter: blur(1.5px);
+  opacity: 0.55;
+}
+.summer-sun {
+  position: absolute;
+  top: 1%;
+  right: 1%;
+  width: clamp(100px, 12vw, 220px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle, #fff7cfeb 0 15%, #ffe9ab99 30%, #edc57444 52%, #edc57400 72%);
+  animation: sun-breath 12s ease-in-out infinite;
+}
+.summer-parasol {
+  position: absolute;
+  top: 5%;
+  left: 2%;
+  width: clamp(80px, 9vw, 150px);
+  opacity: 0.78;
+  transform: rotate(-13deg);
+  filter: drop-shadow(2px 5px 3px #695d4924);
+}
+@keyframes natural-fall {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(calc(var(--sway) * 45px), var(--season-travel), 0);
+  }
+}
+@keyframes leaf-drift {
+  from {
+    transform: rotate(var(--turn)) rotateY(0deg);
+  }
+  to {
+    transform: translateX(calc(var(--sway) * 22px)) rotate(calc(var(--turn) + 65deg)) rotateY(40deg);
+  }
+}
+@keyframes sun-breath {
+  0%,
+  100% {
+    opacity: 0.65;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.85;
+    transform: scale(1.08);
+  }
 }
 .admin-app > .promotion-backdrop {
   position: fixed;

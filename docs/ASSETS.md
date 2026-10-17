@@ -15,3 +15,5 @@
   - Water: https://images.unsplash.com/photo-1548839140-29a749e1cf4d
 
 Illustrations are not exact product representations. Replace them with Blanco photography in the administration.
+
+Seasonal overlays: `public/effects/autumn-leaf.png` is a generated photorealistic transparent leaf for Blanco. `petal.svg` and `parasol.svg` are original shaded illustrations; winter snow and summer sunlight are rendered with CSS gradients. No emoji are used in the TV seasonal overlays.

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import { X } from 'lucide-react';
 import { formatPrice, safeImage } from './lib';
 import type { Product, Settings, Season } from './types';
@@ -45,6 +45,7 @@ export function ProductImage({
   );
 }
 export function SeasonEffect({ season }: { season: Season }) {
+  const layer = useRef<HTMLDivElement>(null);
   let actual = season;
   if (season === 'auto') {
     const month = Number(
@@ -61,30 +62,55 @@ export function SeasonEffect({ season }: { season: Season }) {
             ? 'summer'
             : 'spring';
   }
+  useEffect(() => {
+    const element = layer.current;
+    if (!element) return;
+    const measure = () =>
+      element.style.setProperty('--season-travel', `${element.clientHeight + 180}px`);
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, [actual]);
   if (actual === 'none') return null;
   return (
-    <div className={`season-effect ${actual}`} aria-hidden="true">
-      {Array.from({ length: actual === 'summer' ? 3 : 12 }, (_, i) => (
-        <span
-          key={i}
-          style={{
-            left: `${(i * 37 + 3) % 100}%`,
-            animationDelay: `${i * -1.7}s`,
-            animationDuration: `${14 + (i % 6) * 3}s`,
-            fontSize: `${14 + (i % 3) * 5}px`,
-          }}
-        >
-          {actual === 'autumn'
-            ? '🍂'
-            : actual === 'winter'
-              ? '❄'
-              : actual === 'summer'
-                ? i === 0
-                  ? '☀'
-                  : '⛱'
-                : '✿'}
-        </span>
-      ))}
+    <div ref={layer} className={`season-effect ${actual}`} aria-hidden="true">
+      {actual === 'summer' ? (
+        <>
+          <div className="summer-sun" />
+          <img className="summer-parasol" src="/effects/parasol.svg" alt="" />
+        </>
+      ) : (
+        Array.from({ length: actual === 'winter' ? 24 : 14 }, (_, i) => (
+          <span
+            key={i}
+            className="season-particle"
+            style={
+              {
+                left: `${(i * 37 + 3) % 100}%`,
+                animationDelay: `${i * -2.9}s`,
+                animationDuration: `${20 + (i % 6) * 3}s`,
+                width:
+                  actual === 'winter'
+                    ? `${9 + (i % 4) * 5}px`
+                    : `clamp(36px, ${3.2 + (i % 3) * 0.8}vw, ${60 + (i % 3) * 12}px)`,
+                '--sway': `${i % 2 ? -1 : 1}`,
+                '--turn': `${i * 47}deg`,
+                '--tone': `${(i % 3) * 14 - 10}deg`,
+              } as CSSProperties
+            }
+          >
+            {actual === 'winter' ? (
+              <i className="snow-crystal" />
+            ) : (
+              <img
+                src={actual === 'autumn' ? '/effects/autumn-leaf.png' : '/effects/petal.svg'}
+                alt=""
+              />
+            )}
+          </span>
+        ))
+      )}
     </div>
   );
 }
