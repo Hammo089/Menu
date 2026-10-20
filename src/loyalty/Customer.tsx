@@ -51,6 +51,7 @@ export default function CustomerLoyalty() {
   const [key, setKey] = useState<string | null>(initialKey);
   const [member, setMember] = useState<Member | null>(() => initialCard(initialKey()));
   const [program, setProgram] = useState<Program | null>(null);
+  const [signingOut, setSigningOut] = useState(false);
   const [entryMode, setEntryMode] = useState<'register' | 'login'>(() =>
     new URLSearchParams(location.search).get('connexion') === '1' ? 'login' : 'register',
   );
@@ -166,10 +167,12 @@ export default function CustomerLoyalty() {
     history.replaceState(null, '', `${location.pathname}#cle=${key}`);
     // The manifest receives the private start URL through an HttpOnly cookie, never a query parameter.
     let active = true;
+    const controller = new AbortController();
     void fetch('/api/loyalty-session', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ key }),
+      signal: controller.signal,
     })
       .then((r) => {
         if (r.ok && active) {
@@ -180,6 +183,7 @@ export default function CustomerLoyalty() {
       .catch(() => {});
     return () => {
       active = false;
+      controller.abort();
     };
   }, [key]);
   async function register(e: FormEvent<HTMLFormElement>) {
@@ -253,6 +257,12 @@ export default function CustomerLoyalty() {
     a.click();
     setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
+  if (signingOut)
+    return (
+      <div className="loading-screen">
+        Blanco<span>Déconnexion…</span>
+      </div>
+    );
   const rules = member?.rules || program;
   return (
     <div className="loyalty-app">
@@ -620,6 +630,16 @@ export default function CustomerLoyalty() {
           <button
             className="loy-danger"
             onClick={async () => {
+              // Invalidate in-flight card reads before clearing the device. A slow
+              // pre-logout response must never put its private key back in storage.
+              mounted.current = false;
+              setSigningOut(true);
+              activeKey.current = null;
+              setKey(null);
+              setMember(null);
+              setEntryMode('login');
+              setBusy(true);
+              setModal(null);
               storageSet(CARD_KEY, null);
               storageSet(CACHE_KEY, null);
               await fetch('/api/loyalty-session', {
@@ -627,6 +647,8 @@ export default function CustomerLoyalty() {
                 keepalive: true,
                 signal: AbortSignal.timeout(5000),
               }).catch(() => {});
+              storageSet(CARD_KEY, null);
+              storageSet(CACHE_KEY, null);
               location.replace('/fidelite?connexion=1');
             }}
           >

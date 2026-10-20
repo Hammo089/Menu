@@ -259,6 +259,31 @@ test('loyalty administration switches completely to Arabic with RTL and remember
   await expect(page.locator('html')).toHaveAttribute('dir', 'ltr');
 });
 
+test('a slow card refresh cannot restore the device session after signing out', async ({
+  page,
+}) => {
+  await setup(page);
+  await page.route('**/rest/v1/rpc/loyalty_api', async (route) => {
+    if (route.request().postDataJSON().action === 'card')
+      await new Promise((resolve) => setTimeout(resolve, 350));
+    await route.fallback();
+  });
+  await page.route('**/api/loyalty-session', async (route) => {
+    if (route.request().method() === 'DELETE')
+      await new Promise((resolve) => setTimeout(resolve, 900));
+    await route.fulfill({ json: { ok: true } });
+  });
+  await page.goto('/fidelite?connexion=1');
+  await page.getByLabel('Votre nom et prénom').fill('Camille Martin');
+  await page.getByLabel('Votre téléphone', { exact: true }).fill('0611223344');
+  await page.getByRole('button', { name: 'Retrouver ma carte', exact: true }).click();
+  await page.getByRole('button', { name: 'Me déconnecter de cet appareil', exact: true }).click();
+  await page.getByRole('button', { name: 'Me déconnecter', exact: true }).click();
+  await expect(page.getByRole('heading', { name: 'Heureux de vous revoir.' })).toBeVisible();
+  expect(await page.evaluate(() => localStorage.getItem('blanco-loyalty-key-v1'))).toBeNull();
+  await expect(page.locator('.loy-stamp-card')).toHaveCount(0);
+});
+
 test('opening a replacement private link in an existing tab switches to the new card', async ({
   page,
 }) => {
