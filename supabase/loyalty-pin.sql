@@ -106,13 +106,19 @@ begin
 
   if action='register' then
     if pin_text !~ '^[0-9]{6}$' or pin_text ~ '^([0-9])\1{5}$' or pin_text in ('123456','654321') then return jsonb_build_object('error','Choisissez un PIN personnel de 6 chiffres, sans suite évidente.'); end if;
+    key_hash:=encode(sha256(convert_to(coalesce(payload->>'key',''),'UTF8')),'hex');
+    select * into m from blanco_private.loyalty_members where token_hash=key_hash for update;
+    if found then
+      -- A consumed reset link must never become a PIN guessing endpoint via registration.
+      if not exists(select 1 from blanco_private.loyalty_device_keys k join blanco_private.loyalty_auth la on la.member_id=k.member_id where k.token_hash=key_hash and k.member_id=m.id and k.expires_at>now() and k.auth_version=la.version and la.pin_hash is not null) then return jsonb_build_object('error',invalid_message); end if;
+      return jsonb_build_object('member',blanco_private.loyalty_view(m.id,false),'program',cfg);
+    end if;
     response:=blanco_private.loyalty_api_base(action,payload);
-    key_hash:=encode(sha256(convert_to(payload->>'key','UTF8')),'hex');
     select * into m from blanco_private.loyalty_members where token_hash=key_hash for update;
     if exists(select 1 from blanco_private.loyalty_auth where member_id=m.id) then
       -- Registration retries may re-open the original session, but never overwrite a PIN.
       select * into a from blanco_private.loyalty_auth where member_id=m.id;
-      if a.pin_hash is null or extensions.crypt(pin_text,a.pin_hash) is distinct from a.pin_hash then return jsonb_build_object('error',invalid_message); end if;
+      if not exists(select 1 from blanco_private.loyalty_device_keys k where k.token_hash=key_hash and k.member_id=m.id and k.expires_at>now() and k.auth_version=a.version) or a.pin_hash is null then return jsonb_build_object('error',invalid_message); end if;
     else
       insert into blanco_private.loyalty_auth(member_id,pin_hash) values(m.id,extensions.crypt(pin_text,extensions.gen_salt('bf',12))) returning * into a;
     end if;

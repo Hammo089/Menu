@@ -188,6 +188,18 @@ test('PIN migration revokes weak access, hashes secrets, protects recovery and r
   assert.equal(result.member.stamps, 1);
   assert.equal(result.member.rewards.length, 1);
   assert.ok((await rpc('card', { key: reset })).error, 'recovery link is single-use');
+  assert.ok(
+    (
+      await rpc('register', {
+        name: 'Client Test',
+        phone: '0622334455',
+        key: reset,
+        pin: '736194',
+        consent: true,
+      })
+    ).error,
+    'a consumed reset link cannot be reused through registration',
+  );
   assert.ok((await rpc('activate', { key: reset, deviceKey: newDevice, pin: '592847' })).error);
   assert.equal(
     (await login({ phone: '0622334455', pin: '736194', key: newDevice })).member.code,
