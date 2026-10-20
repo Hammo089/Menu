@@ -83,6 +83,8 @@ function LoyaltyAdminContent() {
   const [modal, setModal] = useState<'recover' | 'erase' | null>(null),
     [recoveryLink, setRecoveryLink] = useState('');
   const [confirmReward, setConfirmReward] = useState<string | null>(null);
+  const [approvalCode, setApprovalCode] = useState('');
+  const [copiedRecovery, setCopiedRecovery] = useState(false);
   const [pending, setPending] = useState<PendingOperation | null>(restoredOperation);
   function rememberOperation(op: PendingOperation | null) {
     setPending(op);
@@ -573,10 +575,29 @@ function LoyaltyAdminContent() {
                                       'Confirmer la remise du cadeau au client ? Aucun tampon ne sera ajouté.',
                                     )}{' '}
                                   </p>
+                                  <label>
+                                    {t('Code cadeau du client (6 chiffres)')}
+                                    <input
+                                      inputMode="numeric"
+                                      autoComplete="off"
+                                      value={approvalCode}
+                                      maxLength={6}
+                                      onChange={(e) =>
+                                        setApprovalCode(e.target.value.replace(/\D/g, ''))
+                                      }
+                                    />
+                                  </label>
+                                  <p className="loy-field-help">
+                                    {t(
+                                      'Le client génère ce code sur son téléphone. Ne lui demandez jamais son PIN.',
+                                    )}
+                                  </p>
                                   <button
                                     className="loy-button"
-                                    disabled={busy}
-                                    onClick={() => void mutate('redeem', { rewardId: r.id })}
+                                    disabled={busy || !/^\d{6}$/.test(approvalCode)}
+                                    onClick={() =>
+                                      void mutate('redeem', { rewardId: r.id, approvalCode })
+                                    }
                                   >
                                     {t('Confirmer l’utilisation')}{' '}
                                   </button>
@@ -592,7 +613,10 @@ function LoyaltyAdminContent() {
                                 <button
                                   className="loy-secondary"
                                   disabled={busy}
-                                  onClick={() => setConfirmReward(r.id)}
+                                  onClick={() => {
+                                    setApprovalCode('');
+                                    setConfirmReward(r.id);
+                                  }}
                                 >
                                   {t('Utiliser ce cadeau')}{' '}
                                 </button>
@@ -773,26 +797,63 @@ function LoyaltyAdminContent() {
                   'Le solde et les cadeaux sont conservés. L’ancien lien ne fonctionne plus. Demandez au client de scanner ce QR et d’enregistrer sa nouvelle carte.',
                 )}{' '}
               </p>
-              <QR
-                value={recoveryLink}
-                label={t('Nouveau lien privé à remettre uniquement au client')}
-              />
-              <a className="loy-link" href={recoveryLink} target="_blank" rel="noreferrer">
-                {t('Ouvrir son nouveau lien')}{' '}
+              <div className="loy-recovery-summary">
+                <strong>
+                  {selected.stamps} / {selected.goal} {t('tampons')}
+                </strong>
+                <span>
+                  {selected.totalStamps} {t('boissons au total')} ·{' '}
+                  {
+                    selected.rewards.filter((r) => r.status === 'ready' || r.status === 'soon')
+                      .length
+                  }{' '}
+                  {t('Cadeaux à utiliser')}
+                </span>
+              </div>
+              <p>
+                {t(
+                  'Ce lien ouvre le suivi client : tampons, boissons comptabilisées et cadeaux. Le client choisit d’abord son nouveau PIN.',
+                )}
+              </p>
+              <label>
+                {t('Lien personnel de suivi du client')}
+                <input
+                  dir="ltr"
+                  readOnly
+                  value={recoveryLink}
+                  onFocus={(e) => e.currentTarget.select()}
+                />
+              </label>
+              <a className="loy-button" href={recoveryLink} target="_blank" rel="noreferrer">
+                {t('Ouvrir son nouveau lien')}
               </a>
               <button
                 className="loy-secondary"
                 onClick={async () => {
                   try {
                     await navigator.clipboard.writeText(recoveryLink);
-                    setNotice('Lien copié. Remettez-le uniquement à ce client.');
+                    setCopiedRecovery(true);
                   } catch {
-                    setError('Copie impossible. Utilisez le QR.');
+                    setError('Copie impossible. Sélectionnez et copiez le lien ci-dessus.');
                   }
                 }}
               >
-                {t('Copier son lien privé')}{' '}
+                {t('Copier son lien privé')}
               </button>
+              {copiedRecovery && (
+                <p className="loy-notice" role="status">
+                  {t('Lien copié. Remettez-le uniquement à ce client.')}
+                </p>
+              )}
+              <p className="loy-field-help">
+                {t(
+                  'Lien valable 30 minutes, à usage unique. Les anciens accès et l’ancien PIN sont désactivés. Le QR ci-dessous ouvre exactement ce même lien.',
+                )}
+              </p>
+              <QR
+                value={recoveryLink}
+                label={t('Nouveau lien privé à remettre uniquement au client')}
+              />
             </>
           ) : (
             <form
@@ -811,6 +872,7 @@ function LoyaltyAdminContent() {
                     verified: f.get('verified') === 'on',
                   });
                   setSelected(r.member);
+                  setCopiedRecovery(false);
                   setRecoveryLink(cardLink(key));
                 } catch (e) {
                   setError((e as Error).message);

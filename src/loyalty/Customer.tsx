@@ -25,6 +25,7 @@ import {
   rewardDescription,
   type Member,
   type Program,
+  type Reward,
 } from './lib';
 import { History, Modal, QR, Rules, StampCard } from './shared';
 import './loyalty.css';
@@ -47,10 +48,50 @@ function initialCard(key: string | null): Member | null {
     return null;
   }
 }
+function PinFields({ confirm = false }: { confirm?: boolean }) {
+  return (
+    <>
+      <label>
+        Votre PIN (6 chiffres)
+        <input
+          name="pin"
+          type="password"
+          inputMode="numeric"
+          pattern="[0-9]{6}"
+          minLength={6}
+          maxLength={6}
+          autoComplete={confirm ? 'new-password' : 'current-password'}
+          required
+        />
+      </label>
+      {confirm && (
+        <label>
+          Confirmez votre PIN
+          <input
+            name="pinConfirm"
+            type="password"
+            inputMode="numeric"
+            pattern="[0-9]{6}"
+            minLength={6}
+            maxLength={6}
+            autoComplete="new-password"
+            required
+          />
+        </label>
+      )}
+    </>
+  );
+}
+const goodPin = (pin: string) =>
+  /^[0-9]{6}$/.test(pin) && !/^([0-9])\1{5}$/.test(pin) && !['123456', '654321'].includes(pin);
 export default function CustomerLoyalty() {
   const [key, setKey] = useState<string | null>(initialKey);
   const [member, setMember] = useState<Member | null>(() => initialCard(initialKey()));
   const [program, setProgram] = useState<Program | null>(null);
+  const [setupName, setSetupName] = useState<string | null>(null);
+  const [giftReward, setGiftReward] = useState<Reward | null>(null);
+  const [giftCode, setGiftCode] = useState<{ code: string; expires: string } | null>(null);
+  const [giftError, setGiftError] = useState('');
   const [signingOut, setSigningOut] = useState(false);
   const [entryMode, setEntryMode] = useState<'register' | 'login'>(() =>
     new URLSearchParams(location.search).get('connexion') === '1' ? 'login' : 'register',
@@ -60,7 +101,7 @@ export default function CustomerLoyalty() {
     [error, setError] = useState('');
   const [offline, setOffline] = useState(true),
     [savedAt, setSavedAt] = useState('');
-  const [modal, setModal] = useState<'qr' | 'save' | 'forget' | null>(null),
+  const [modal, setModal] = useState<'qr' | 'save' | 'forget' | 'reward' | null>(null),
     [notice, setNotice] = useState('');
   const [install, setInstall] = useState<InstallEvent | null>(null);
   const registrationKey = useRef(makeKey());
@@ -73,6 +114,7 @@ export default function CustomerLoyalty() {
       const incoming = new URLSearchParams(location.hash.slice(1)).get('cle');
       if (!validKey(incoming) || incoming === activeKey.current) return;
       setMember(initialCard(incoming));
+      setSetupName(null);
       setOffline(true);
       setSavedAt('');
       setNotice('');
@@ -85,6 +127,8 @@ export default function CustomerLoyalty() {
     return () => removeEventListener('hashchange', change);
   }, []);
   useEffect(() => {
+    storageSet('blanco-loyalty-key-v1', null);
+    storageSet('blanco-loyalty-cache-v1', null);
     mounted.current = true;
     return () => {
       mounted.current = false;
@@ -100,6 +144,13 @@ export default function CustomerLoyalty() {
         setError('');
         setOffline(false);
         setSavedAt(new Date().toISOString());
+        if (result.setupRequired) {
+          setSetupName(result.setupName || '');
+          setMember(null);
+          storageSet(CACHE_KEY, null);
+          return;
+        }
+        setSetupName(null);
         if (key && result.member) {
           setMember(result.member);
           storageSet(CACHE_KEY, JSON.stringify({ key, member: result.member }));
@@ -108,6 +159,11 @@ export default function CustomerLoyalty() {
       } catch (e) {
         if (mounted.current && activeKey.current === key) {
           setOffline(true);
+          if ((e as Error & { definitive?: boolean }).definitive) {
+            setMember(null);
+            setSetupName(null);
+            storageSet(CACHE_KEY, null);
+          }
           if (!silent) setError((e as Error).message);
         }
       } finally {
@@ -193,10 +249,16 @@ export default function CustomerLoyalty() {
     setError('');
     const form = new FormData(e.currentTarget);
     try {
+      const pin = String(form.get('pin') || '');
+      if (entryMode === 'register' && (!goodPin(pin) || pin !== form.get('pinConfirm')))
+        throw new Error(
+          'Choisissez un PIN personnel de 6 chiffres et confirmez-le à l’identique, sans suite évidente.',
+        );
       const result = await rpc(entryMode === 'login' ? 'login' : 'register', {
         key: registrationKey.current,
         name: form.get('name'),
         phone: form.get('phone'),
+        pin,
         consent: form.get('consent') === 'on',
         website: form.get('website'),
       });
@@ -221,11 +283,53 @@ export default function CustomerLoyalty() {
       setBusy(false);
     }
   }
+  async function activate(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    if (busy || !key) return;
+    setBusy(true);
+    setError('');
+    const form = new FormData(e.currentTarget);
+    const pin = String(form.get('pin') || '');
+    try {
+      if (!goodPin(pin) || pin !== form.get('pinConfirm'))
+        throw new Error(
+          'Choisissez un PIN personnel de 6 chiffres et confirmez-le à l’identique, sans suite évidente.',
+        );
+      let result;
+      try {
+        result = await rpc('activate', { key, deviceKey: registrationKey.current, pin });
+      } catch (original) {
+        try {
+          result = await rpc('card', { key: registrationKey.current });
+        } catch {
+          throw original;
+        }
+      }
+      storageSet(CARD_KEY, registrationKey.current);
+      storageSet(
+        CACHE_KEY,
+        JSON.stringify({ key: registrationKey.current, member: result.member }),
+      );
+      setMember(result.member);
+      setProgram(result.program);
+      setSetupName(null);
+      setKey(registrationKey.current);
+      setOffline(false);
+      setNotice(
+        'Votre PIN est enregistré. Retrouvez ici vos tampons, vos boissons comptabilisées et vos cadeaux.',
+      );
+    } catch (e) {
+      setError((e as Error).message);
+    } finally {
+      setBusy(false);
+    }
+  }
   function showLogin() {
     storageSet(CARD_KEY, null);
     storageSet(CACHE_KEY, null);
     setKey(null);
     setMember(null);
+    setSetupName(null);
     setEntryMode('login');
     setError('');
     setNotice('');
@@ -277,9 +381,10 @@ export default function CustomerLoyalty() {
       {consentPage ? (
         <main className="loy-legal">
           <p>
-            Vous pouvez rouvrir votre carte avec votre nom enregistré et votre téléphone, sans mot
-            de passe ni SMS. Ces informations ne prouvent pas la possession du numéro. Seule
-            l’équipe peut ajouter des tampons ou utiliser un cadeau.
+            Vous pouvez rouvrir votre carte avec votre téléphone et votre PIN personnel de six
+            chiffres. Gardez votre PIN secret. L’équipe ne vous demandera jamais votre PIN : pour
+            utiliser un cadeau, générez sur votre téléphone un code cadeau temporaire après saisie
+            de votre PIN.
           </p>
           <span className="loy-eyebrow">EN TOUTE TRANSPARENCE</span>
           <h1>
@@ -294,16 +399,17 @@ export default function CustomerLoyalty() {
           </p>
           <p>
             Votre QR de caisse contient uniquement votre code de carte. Votre lien personnel permet
-            de consulter votre carte : gardez-le privé. Seule l’équipe autorisée peut ajouter des
-            tampons ou utiliser un cadeau.
+            de consulter votre carte : gardez-le privé. Une photo du QR ne suffit pas à utiliser un
+            cadeau. Seule l’équipe autorisée peut ajouter des tampons ou utiliser un cadeau.
           </p>
           <h2>Carte perdue ou accès oublié ?</h2>
           <p>
             Si vous perdez votre carte, votre lien personnel ou ne parvenez plus à accéder à votre
-            compte, contactez la direction de Blanco au comptoir. Après vérification de votre nom
-            et de votre numéro de téléphone, l’équipe vous aidera à retrouver le même compte, avec
-            vos tampons et vos cadeaux encore valables. Il n’est pas nécessaire de créer un nouveau
-            compte.
+            compte, contactez la direction de Blanco au comptoir. Après vérification de votre nom et
+            de votre numéro de téléphone au comptoir, la direction vous remettra un lien sécurisé,
+            valable 30 minutes et utilisable une seule fois, pour choisir un nouveau PIN et
+            retrouver le même compte, avec vos tampons et vos cadeaux encore valables. Il n’est pas
+            nécessaire de créer un nouveau compte.
           </p>
           <p>
             Vos données et votre historique sont conservés tant que votre carte existe. Demandez au
@@ -370,6 +476,23 @@ export default function CustomerLoyalty() {
             )}
             {loading && !member && !program ? (
               <div className="loy-panel">Votre pause se prépare…</div>
+            ) : setupName !== null ? (
+              <form className="loy-panel" onSubmit={activate}>
+                <span className="loy-eyebrow">VOTRE CARTE EST RETROUVÉE</span>
+                <h2>Bonjour {setupName.split(' ')[0]}.</h2>
+                <p>
+                  Choisissez votre nouveau PIN personnel. Vous retrouverez ensuite vos tampons, vos
+                  boissons comptabilisées et vos cadeaux. Ce lien ne s’utilise qu’une fois.
+                </p>
+                <PinFields confirm />
+                <p className="loy-field-help">
+                  Évitez 123456 et les chiffres identiques. Gardez votre PIN pour vous : notre
+                  équipe ne vous le demandera pas.
+                </p>
+                <button className="loy-button" disabled={busy}>
+                  {busy ? 'Sécurisation…' : 'Enregistrer mon PIN et ouvrir ma carte'}
+                </button>
+              </form>
             ) : member ? (
               <>
                 <div className="loy-member-heading">
@@ -409,6 +532,21 @@ export default function CustomerLoyalty() {
                   <span>Ou donnez ce code en caisse</span>
                   <strong>{member.code}</strong>
                 </div>
+                <div className="loy-customer-totals">
+                  <div>
+                    <strong>{member.totalStamps}</strong>
+                    <span>Boissons comptabilisées</span>
+                  </div>
+                  <div>
+                    <strong>
+                      {
+                        member.rewards.filter((r) => r.status === 'ready' || r.status === 'soon')
+                          .length
+                      }
+                    </strong>
+                    <span>Cadeaux en réserve</span>
+                  </div>
+                </div>
                 {member.rewards.some((r) => r.status === 'ready' || r.status === 'soon') && (
                   <section className="loy-gifts">
                     <span className="loy-eyebrow">UNE ATTENTION POUR VOUS</span>
@@ -431,6 +569,19 @@ export default function CustomerLoyalty() {
                                 ? 'À savourer au comptoir'
                                 : 'Bientôt disponible'}
                             </strong>
+                            {r.status === 'ready' && (
+                              <button
+                                className="loy-secondary"
+                                onClick={() => {
+                                  setGiftReward(r);
+                                  setGiftCode(null);
+                                  setGiftError('');
+                                  setModal('reward');
+                                }}
+                              >
+                                Préparer mon cadeau
+                              </button>
+                            )}
                           </div>
                         </article>
                       ))}
@@ -458,10 +609,11 @@ export default function CustomerLoyalty() {
               <div className="loy-panel">
                 <h2>Retrouvons votre carte.</h2>
                 <p>
-                  Entrez votre nom et votre téléphone pour retrouver vos tampons et vos cadeaux.
+                  Connectez-vous avec votre téléphone et votre PIN. Pour un ancien compte sans PIN
+                  ou un PIN oublié, demandez un lien sécurisé à la direction de Blanco.
                 </p>
                 <button className="loy-secondary" onClick={showLogin}>
-                  Me connecter avec mon nom et mon téléphone
+                  Me connecter avec mon téléphone et mon PIN
                 </button>
               </div>
             ) : (
@@ -494,20 +646,22 @@ export default function CustomerLoyalty() {
                 </h2>
                 <p>
                   {entryMode === 'login'
-                    ? 'Votre nom enregistré et votre téléphone suffisent pour retrouver votre carte.'
+                    ? 'Votre téléphone et votre PIN personnel pour retrouver votre carte.'
                     : 'Deux petites infos, et votre prochaine pause compte déjà.'}
                 </p>
-                <label>
-                  Votre nom et prénom
-                  <input
-                    name="name"
-                    autoComplete="name"
-                    minLength={2}
-                    maxLength={70}
-                    required
-                    placeholder="Camille Martin"
-                  />
-                </label>
+                {entryMode === 'register' && (
+                  <label>
+                    Votre nom et prénom
+                    <input
+                      name="name"
+                      autoComplete="name"
+                      minLength={2}
+                      maxLength={70}
+                      required
+                      placeholder="Camille Martin"
+                    />
+                  </label>
+                )}
                 <label>
                   Votre téléphone
                   <input
@@ -520,10 +674,11 @@ export default function CustomerLoyalty() {
                     placeholder="06 12 34 56 78"
                   />
                 </label>
+                <PinFields key={entryMode} confirm={entryMode === 'register'} />
                 <p className="loy-field-help">
                   {entryMode === 'login'
-                    ? 'Saisissez exactement le nom de votre inscription. Aucun mot de passe ni SMS nécessaire.'
-                    : 'Votre nom et votre téléphone permettent aussi de rouvrir votre carte. Aucun SMS publicitaire.'}
+                    ? 'PIN oublié ou ancien compte sans PIN ? La direction peut vous remettre un lien sécurisé. Ne créez pas une seconde carte.'
+                    : 'Gardez votre PIN secret. Pas de SMS publicitaire. Évitez les suites évidentes et les chiffres identiques.'}
                 </p>
                 <label className="loy-honeypot" aria-hidden="true">
                   Votre site
@@ -558,7 +713,7 @@ export default function CustomerLoyalty() {
                 </button>
                 <p className="loy-field-help">
                   {entryMode === 'login'
-                    ? 'Vous avez changé de numéro ou oublié le nom enregistré ? Notre équipe peut vous aider au comptoir.'
+                    ? 'Notre équipe peut vous aider au comptoir si vous avez oublié votre PIN ou changé de numéro.'
                     : 'Déjà inscrit ? Utilisez « J’ai déjà une carte » pour retrouver vos tampons.'}
                 </p>
               </form>
@@ -629,11 +784,83 @@ export default function CustomerLoyalty() {
           </button>
         </Modal>
       )}
+      {modal === 'reward' && giftReward && (
+        <Modal
+          title="Votre cadeau, en toute sérénité."
+          onClose={() => {
+            setModal(null);
+            setGiftCode(null);
+            setGiftError('');
+          }}
+        >
+          {giftCode ? (
+            <>
+              <p>
+                Donnez ce code cadeau à notre équipe. Il ne s’utilise qu’une fois pour cette
+                récompense.
+              </p>
+              <strong className="loy-approval-code" aria-label="Code cadeau temporaire">
+                {giftCode.code}
+              </strong>
+              <p>
+                Valable jusqu’à{' '}
+                {new Date(giftCode.expires).toLocaleTimeString('fr-FR', {
+                  hour: '2-digit',
+                  minute: '2-digit',
+                  timeZone: 'Europe/Paris',
+                })}
+                , heure de Grenoble (5 minutes maximum).
+              </p>
+              <button className="loy-secondary" onClick={() => setGiftCode(null)}>
+                Générer un nouveau code
+              </button>
+            </>
+          ) : (
+            <form
+              onSubmit={async (e) => {
+                e.preventDefault();
+                if (busy || !key) return;
+                setBusy(true);
+                setGiftError('');
+                const pin = new FormData(e.currentTarget).get('pin');
+                try {
+                  const result = await rpc('reward_authorize', {
+                    key,
+                    pin,
+                    rewardId: giftReward.id,
+                  });
+                  if (!result.approvalCode || !result.approvalExpiresAt)
+                    throw Error('Impossible de préparer ce cadeau. Réessayez.');
+                  setGiftCode({ code: result.approvalCode, expires: result.approvalExpiresAt });
+                } catch (e) {
+                  setGiftError((e as Error).message);
+                } finally {
+                  setBusy(false);
+                }
+              }}
+            >
+              <p>
+                {giftReward.label}. Entrez votre PIN ici, sur votre téléphone. Ne communiquez jamais
+                votre PIN à l’équipe : seul le code cadeau temporaire lui sera remis.
+              </p>
+              <PinFields />
+              <button className="loy-button" disabled={busy}>
+                {busy ? 'Préparation…' : 'Obtenir mon code cadeau'}
+              </button>
+            </form>
+          )}
+          {giftError && (
+            <p className="loy-alert" role="alert">
+              {giftError}
+            </p>
+          )}
+        </Modal>
+      )}
       {modal === 'forget' && (
         <Modal title="Vous déconnecter de cet appareil ?" onClose={() => setModal(null)}>
           <p>
             Votre compte, vos tampons et vos cadeaux restent chez Blanco. Pour revenir, saisissez
-            simplement votre nom enregistré et votre téléphone dans « J’ai déjà une carte ».
+            simplement votre téléphone et votre PIN dans « J’ai déjà une carte ».
           </p>
           <button
             className="loy-danger"

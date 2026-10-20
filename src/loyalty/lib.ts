@@ -43,6 +43,11 @@ export interface Member {
   lastEvent?: { id: string; kind: string; canUndo: boolean };
 }
 export interface Result {
+  setupRequired?: boolean;
+  setupName?: string;
+  approvalCode?: string;
+  approvalExpiresAt?: string;
+  recoveryExpiresAt?: string;
   member: Member;
   program: Program;
   owner: boolean;
@@ -51,8 +56,8 @@ export interface Result {
   stats: { members: number; stamps: number; ready: number; redeemed: number };
   staff: { email: string; active: boolean }[];
 }
-export const CARD_KEY = 'blanco-loyalty-key-v1';
-export const CACHE_KEY = 'blanco-loyalty-cache-v1';
+export const CARD_KEY = 'blanco-loyalty-key-v2';
+export const CACHE_KEY = 'blanco-loyalty-cache-v2';
 export const validKey = (key: string | null): key is string => !!key && /^[a-f0-9]{64}$/.test(key);
 export const makeKey = () =>
   [...crypto.getRandomValues(new Uint8Array(32))]

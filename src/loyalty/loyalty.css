@@ -1297,3 +1297,60 @@
   direction: ltr;
   unicode-bidi: isolate;
 }
+.loy-recovery-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  padding: 16px;
+  background: #eaf0e1;
+  border: 1px solid #d7e2ca;
+  border-radius: 12px;
+  margin: 18px 0;
+  font-size: 13px;
+}
+.loy-recovery-summary strong {
+  font-size: 22px;
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+.loy-modal input[readonly] {
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+.loy-approval-code {
+  display: block;
+  margin: 25px auto;
+  padding: 20px;
+  background: #e6eddd;
+  border: 1px solid #cfdbc4;
+  border-radius: 14px;
+  text-align: center;
+  letter-spacing: 9px;
+  font: 38px monospace;
+  direction: ltr;
+}
+.loy-customer-totals {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 25px;
+}
+.loy-customer-totals > div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px 10px;
+  background: #fffefa;
+  border: 1px solid var(--loy-line);
+  border-radius: 15px;
+}
+.loy-customer-totals strong {
+  font:
+    32px Georgia,
+    serif;
+}
+.loy-customer-totals span {
+  font-size: 10px;
+  color: #78836e;
+}

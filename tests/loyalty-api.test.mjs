@@ -48,6 +48,15 @@ test('PWA install uses a verified private cookie and fragment, without shared ca
     assert.match(removed.headers.get('set-cookie'), /Max-Age=0/);
     globalThis.fetch = async () => new Response('{}', { status: 400 });
     assert.equal((await POST(request({ key }))).headers.get('set-cookie'), null);
+    globalThis.fetch = async () =>
+      new Response(JSON.stringify({ setupRequired: true, setupName: 'Camille' }));
+    assert.equal(
+      (await POST(request({ key }))).headers.get('set-cookie'),
+      null,
+      'single-use reset links must not become installed app credentials',
+    );
+    globalThis.fetch = async () => new Response(JSON.stringify({ error: 'Invalid card' }));
+    assert.equal((await POST(request({ key }))).status, 400);
   } finally {
     globalThis.fetch = oldFetch;
     if (oldURL === undefined) delete process.env.VITE_SUPABASE_URL;

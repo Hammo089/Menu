@@ -33,6 +33,9 @@ export async function POST(request: Request) {
       signal: AbortSignal.timeout(8000),
     });
     if (!result.ok) return new Response('{}', { status: 400, headers });
+    const data = await result.json();
+    if (data.error || data.setupRequired || !data.member?.code)
+      return new Response('{}', { status: 400, headers });
     return new Response('{"ok":true}', {
       headers: {
         ...headers,
