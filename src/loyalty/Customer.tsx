@@ -62,6 +62,24 @@ export default function CustomerLoyalty() {
   const registrationKey = useRef(makeKey());
   const consentPage = location.pathname.endsWith('/confidentialite');
   const mounted = useRef(true);
+  const activeKey = useRef(key);
+  activeKey.current = key;
+  useEffect(() => {
+    const change = () => {
+      const incoming = new URLSearchParams(location.hash.slice(1)).get('cle');
+      if (!validKey(incoming) || incoming === activeKey.current) return;
+      setMember(initialCard(incoming));
+      setOffline(true);
+      setSavedAt('');
+      setNotice('');
+      setError('');
+      setModal(null);
+      setLoading(true);
+      setKey(incoming);
+    };
+    addEventListener('hashchange', change);
+    return () => removeEventListener('hashchange', change);
+  }, []);
   useEffect(() => {
     mounted.current = true;
     return () => {
@@ -73,7 +91,7 @@ export default function CustomerLoyalty() {
       if (!silent) setLoading(true);
       try {
         const result = await rpc(key ? 'card' : 'program', key ? { key } : {});
-        if (!mounted.current) return;
+        if (!mounted.current || activeKey.current !== key) return;
         setProgram(result.program);
         setError('');
         setOffline(false);
@@ -84,12 +102,12 @@ export default function CustomerLoyalty() {
           storageSet(CARD_KEY, key);
         }
       } catch (e) {
-        if (mounted.current) {
+        if (mounted.current && activeKey.current === key) {
           setOffline(true);
           if (!silent) setError((e as Error).message);
         }
       } finally {
-        if (mounted.current) setLoading(false);
+        if (mounted.current && activeKey.current === key) setLoading(false);
       }
     },
     [key],

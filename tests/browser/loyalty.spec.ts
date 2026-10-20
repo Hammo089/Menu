@@ -196,6 +196,23 @@ test('public customer code opens the staff login, never a customer private card'
   await expect(page.getByText('Camille Martin', { exact: true })).toHaveCount(0);
 });
 
+test('opening a replacement private link in an existing tab switches to the new card', async ({
+  page,
+}) => {
+  const calls = await setup(page);
+  await page.goto(`/fidelite#cle=${'a'.repeat(64)}`);
+  await expect(page.getByLabel('3 tampons sur 8')).toBeVisible();
+  await page.evaluate(() => {
+    location.hash = `cle=${'b'.repeat(64)}`;
+  });
+  await expect
+    .poll(() => calls.filter((c) => c.action === 'card').at(-1)?.payload.key)
+    .toBe('b'.repeat(64));
+  await expect
+    .poll(() => page.evaluate(() => localStorage.getItem('blanco-loyalty-key-v1')))
+    .toBe('b'.repeat(64));
+});
+
 test('an interrupted cashier operation survives reload and retries with the same transaction id', async ({
   page,
 }) => {

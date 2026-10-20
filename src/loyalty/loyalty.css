@@ -198,6 +198,7 @@
 .loyalty-app select,
 .loyalty-app textarea {
   width: 100%;
+  font-size: 16px;
   border: 1px solid #dce0d4;
   border-radius: 10px;
   padding: 13px 14px;
@@ -1153,7 +1154,7 @@
     padding: 12px;
   }
   .loy-inline-form input {
-    font-size: 12px !important;
+    font-size: 16px !important;
   }
   .loy-poster {
     padding: 28px 22px;
