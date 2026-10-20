@@ -297,6 +297,14 @@ export default function CustomerLoyalty() {
             de consulter votre carte : gardez-le privé. Seule l’équipe autorisée peut ajouter des
             tampons ou utiliser un cadeau.
           </p>
+          <h2>Carte perdue ou accès oublié ?</h2>
+          <p>
+            Si vous perdez votre carte, votre lien personnel ou ne parvenez plus à accéder à votre
+            compte, contactez la direction de Blanco au comptoir. Après vérification de votre nom
+            et de votre numéro de téléphone, l’équipe vous aidera à retrouver le même compte, avec
+            vos tampons et vos cadeaux encore valables. Il n’est pas nécessaire de créer un nouveau
+            compte.
+          </p>
           <p>
             Vos données et votre historique sont conservés tant que votre carte existe. Demandez au
             responsable au comptoir de consulter, corriger ou supprimer vos données. La suppression
