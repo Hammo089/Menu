@@ -1,0 +1,17 @@
+{
+  "id": "/fidelite",
+  "name": "Blanco Club — Ma carte fidélité",
+  "short_name": "Blanco Club",
+  "description": "Vos pauses café, vos petites attentions. Votre carte de fidélité Blanco à Grenoble.",
+  "lang": "fr",
+  "start_url": "/fidelite",
+  "scope": "/fidelite",
+  "display": "standalone",
+  "theme_color": "#234b3a",
+  "background_color": "#f8f5ee",
+  "icons": [
+    {"src":"/loyalty-icons/icon-192.png","sizes":"192x192","type":"image/png","purpose":"any"},
+    {"src":"/loyalty-icons/icon-512.png","sizes":"512x512","type":"image/png","purpose":"any"},
+    {"src":"/loyalty-icons/maskable-512.png","sizes":"512x512","type":"image/png","purpose":"maskable"}
+  ]
+}

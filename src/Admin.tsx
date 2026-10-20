@@ -423,6 +423,10 @@ export default function Admin() {
           ))}
         </nav>
         <div className="sidebar-bottom">
+          <a href="/admin/fidelite">
+            <Coffee size={17} />
+            {l('برنامج الولاء', 'Programme fidélité')}
+          </a>
           <a href="/" target="_blank" rel="noreferrer">
             <ArrowUpRight size={17} />
             {t.view}

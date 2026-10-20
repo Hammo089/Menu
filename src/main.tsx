@@ -5,8 +5,22 @@ import CustomerMenu from './CustomerMenu';
 import './styles.css';
 const Admin = lazy(() => import('./Admin'));
 const TVMenu = lazy(() => import('./TVMenu'));
+const CustomerLoyalty = lazy(() => import('./loyalty/Customer'));
+const LoyaltyAdmin = lazy(() => import('./loyalty/Admin'));
 const path = window.location.pathname.replace(/\/$/, '') || '/';
 function App() {
+  if (['/fidelite', '/fidelite/confidentialite', '/admin/fidelite'].includes(path))
+    return (
+      <Suspense
+        fallback={
+          <div className="loading-screen">
+            Blanco<span>Un petit instant…</span>
+          </div>
+        }
+      >
+        {path === '/admin/fidelite' ? <LoyaltyAdmin /> : <CustomerLoyalty />}
+      </Suspense>
+    );
   if (!['/', '/menu', '/tv', '/admin'].includes(path))
     return (
       <main className="not-found">

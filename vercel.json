@@ -25,6 +25,32 @@
           "value": "DENY"
         }
       ]
+    },
+    {
+      "source": "/fidelite(.*)",
+      "headers": [
+        {
+          "key": "Referrer-Policy",
+          "value": "no-referrer"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "private, no-cache"
+        }
+      ]
+    },
+    {
+      "source": "/loyalty-sw.js",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-cache"
+        },
+        {
+          "key": "Service-Worker-Allowed",
+          "value": "/fidelite"
+        }
+      ]
     }
   ]
 }

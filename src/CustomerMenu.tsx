@@ -48,6 +48,9 @@ export default function CustomerMenu() {
         <a className="header-menu-link" href="#carte">
           Notre carte <ArrowUpRight size={15} />
         </a>
+        <a className="header-menu-link" href="/fidelite">
+          Blanco Club
+        </a>
       </header>
       <section className="hero">
         <div className="hero-copy">
