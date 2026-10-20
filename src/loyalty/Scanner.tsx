@@ -1,8 +1,11 @@
+import { useLoyaltyLanguage } from './i18n';
 import { useEffect, useRef, useState } from 'react';
 import { Camera, ImagePlus } from 'lucide-react';
 import { readScan } from './lib';
 
 export default function Scanner({ onScan }: { onScan: (code: string) => void }) {
+  const { t } = useLoyaltyLanguage();
+
   const video = useRef<HTMLVideoElement>(null);
   const controls = useRef<{ stop(): void } | null>(null);
   const [error, setError] = useState(''),
@@ -64,15 +67,21 @@ export default function Scanner({ onScan }: { onScan: (code: string) => void }) 
   return (
     <section className="loy-scanner">
       <div className={running ? 'loy-camera active' : 'loy-camera'}>
-        <video ref={video} muted playsInline autoPlay aria-label="Caméra pour scanner la carte" />
+        <video
+          ref={video}
+          muted
+          playsInline
+          autoPlay
+          aria-label={t('Caméra pour scanner la carte')}
+        />
         {!running && <Camera size={42} />}
       </div>
       <div className="loy-actions">
         <button className="loy-button" onClick={() => (running ? stop() : void start())}>
-          {running ? 'Arrêter la caméra' : 'Scanner une carte'}
+          {running ? t('Arrêter la caméra') : t('Scanner une carte')}
         </button>
         <label className="loy-secondary loy-file">
-          <ImagePlus size={17} /> Photo du QR
+          <ImagePlus size={17} /> {t('Photo du QR')}{' '}
           <input
             type="file"
             accept="image/*"
@@ -103,11 +112,13 @@ export default function Scanner({ onScan }: { onScan: (code: string) => void }) 
         </label>
       </div>
       <p className="loy-field-help">
-        La caméra et les photos sont traitées sur cet appareil, jamais envoyées au serveur.
+        {t(
+          'La caméra et les photos sont traitées sur cet appareil, jamais envoyées au serveur.',
+        )}{' '}
       </p>
       {error && (
         <p role="alert" className="loy-alert">
-          {error}
+          {t(error)}
         </p>
       )}
     </section>

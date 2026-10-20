@@ -10,6 +10,18 @@
 
 La carte client s’actualise toutes les 30 secondes et au retour dans l’application. Le solde est calculé sur le serveur. Une connexion est indispensable pour inscrire, ajouter des tampons, utiliser un cadeau ou récupérer un accès. Le QR d’une carte déjà enregistrée reste présentable hors ligne ; le personnel vérifie le solde en ligne.
 
+## Langue de gestion et retour sur la carte
+
+La gestion propose **عربي / FR** dès la connexion et mémorise la langue sur l’appareil. Les formulaires, actions et messages passent en arabe avec une disposition RTL. Les pages clients et l’affiche imprimée restent en français.
+
+Dans `/fidelite`, choisir **J’ai déjà une carte**, saisir le nom exact enregistré et le téléphone, puis **Retrouver ma carte**. Les majuscules et espaces superflus sont ignorés ; les numéros locaux français, +33 et 0033 sont normalisés. Le même compte, les mêmes tampons et cadeaux sont retrouvés. La carte reste mémorisée sur l’appareil ; se connecter sur un autre ne déconnecte pas les précédents.
+
+**Me déconnecter de cet appareil** retire uniquement la copie locale et ouvre le formulaire de retour. Le compte existe toujours. En cas de changement de numéro ou d’oubli du nom enregistré, le comptoir peut renouveler le lien.
+
+Ce choix privilégie la simplicité : le nom et le téléphone ne sont pas un secret ni une preuve de possession du numéro. Aucun mot de passe client ou SMS n’est utilisé. La connexion permet seulement la consultation de la carte ; l’équipe garde le contrôle des tampons et des cadeaux. Les échecs sont limités par numéro et par adresse réseau, sans révéler si un téléphone est inscrit.
+
+Chaque appareil reçoit une clé aléatoire de consultation, stockée hachée en base, valable 180 jours. Au plus 10 clés d’appareil sont conservées par carte. Le renouvellement du lien par le responsable révoque ces clés ; le client peut toujours se reconnecter avec son nom et son numéro.
+
 ## Règles initiales, entièrement modifiables
 
 - 8 boissons payées en 30 jours depuis le premier tampon donnent une boisson offerte.
@@ -44,9 +56,9 @@ Il s’agit d’une **application web installable (PWA)**, pas d’un pass Apple
 
 ## Données et déploiement
 
-La page `/fidelite/confidentialite` décrit le traitement des données. Le responsable peut supprimer définitivement une carte à la demande de son titulaire depuis sa fiche : profil, cadeaux et journal sont supprimés ensemble. **Retirer la carte de cet appareil** enlève uniquement la copie locale et ne supprime pas le compte.
+La page `/fidelite/confidentialite` décrit le traitement des données. Le responsable peut supprimer définitivement une carte à la demande de son titulaire depuis sa fiche : profil, cadeaux et journal sont supprimés ensemble. **Me déconnecter de cet appareil** enlève uniquement la copie locale et ne supprime pas le compte.
 
-Pour une nouvelle base, appliquer `supabase/schema.sql`, puis `supabase/loyalty.sql`, puis `supabase/loyalty-hardening.sql`. Ne pas rejouer ces créations sur une base déjà migrée. Les tables fidélité restent dans `blanco_private` (non exposé par PostgREST), sans accès direct pour `anon`/`authenticated`. Les fonctions vérifient l’identité de chaque opérateur. La clé privée de consultation est aléatoire (256 bits), stockée hachée en base et placée uniquement dans le fragment du lien.
+Pour une nouvelle base, appliquer `supabase/schema.sql`, puis `supabase/loyalty.sql`, puis `supabase/loyalty-hardening.sql`, puis `supabase/loyalty-login.sql`. Ne pas rejouer ces créations sur une base déjà migrée. Les tables fidélité restent dans `blanco_private` (non exposé par PostgREST), sans accès direct pour `anon`/`authenticated`. Les fonctions vérifient l’identité de chaque opérateur. La clé privée de consultation est aléatoire (256 bits), stockée hachée en base et placée uniquement dans le fragment du lien.
 
 Les fonctions `/api/loyalty-session` et `/api/loyalty-manifest` utilisent les deux variables **publiques** Supabase déjà configurées. Elles personnalisent le lien de démarrage de la PWA via un cookie HttpOnly, Secure et SameSite=Strict, après vérification de la carte. Elles ne mettent jamais le secret en query string et leurs réponses ne sont pas mises en cache. Aucun service-role n’est nécessaire.
 

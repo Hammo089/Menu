@@ -1,3 +1,4 @@
+import { useLoyaltyLanguage } from './i18n';
 import { useEffect, useRef, useState } from 'react';
 import { Coffee, Gift, X } from 'lucide-react';
 import { date, rewardDescription, type Member, type Program } from './lib';
@@ -11,6 +12,8 @@ export function QR({
   label?: string;
   download?: boolean;
 }) {
+  const { t, lang } = useLoyaltyLanguage();
+
   const [src, setSrc] = useState('');
   useEffect(() => {
     let active = true;
@@ -34,10 +37,10 @@ export function QR({
   }, [value]);
   return (
     <div className="loy-qr">
-      {src ? <img src={src} alt={label} /> : <p>Préparation du QR…</p>}
+      {src ? <img src={src} alt={t(label)} /> : <p>{t('Préparation du QR…')}</p>}
       {download && src && (
         <a className="loy-link" href={src} download="blanco-fidelite-qr.png">
-          Télécharger le QR
+          {t('Télécharger le QR')}{' '}
         </a>
       )}
     </div>
@@ -52,6 +55,8 @@ export function Modal({
   children: React.ReactNode;
   onClose: () => void;
 }) {
+  const { t, lang } = useLoyaltyLanguage();
+
   const dialog = useRef<HTMLElement>(null);
   const close = useRef(onClose);
   close.current = onClose;
@@ -100,7 +105,7 @@ export function Modal({
         aria-label={title}
         ref={dialog}
       >
-        <button className="loy-icon-button" aria-label="Fermer" onClick={onClose}>
+        <button className="loy-icon-button" aria-label={t('Fermer')} onClick={onClose}>
           <X />
         </button>
         <h2>{title}</h2>
@@ -110,6 +115,8 @@ export function Modal({
   );
 }
 export function StampCard({ member }: { member: Member }) {
+  const { t, lang } = useLoyaltyLanguage();
+
   return (
     <section className="loy-stamp-card">
       <div className="loy-card-top">
@@ -117,12 +124,12 @@ export function StampCard({ member }: { member: Member }) {
         <Coffee size={23} />
       </div>
       <h2>
-        Bonjour {member.name.split(' ')[0]}
-        <span>Votre prochaine pause se prépare.</span>
+        {t('Bonjour')} {member.name.split(' ')[0]}
+        <span>{t('Votre prochaine pause se prépare.')}</span>
       </h2>
       <div
         className="loy-stamps"
-        aria-label={`${member.stamps} tampons sur ${member.goal}`}
+        aria-label={t('{0} tampons sur {1}', member.stamps, member.goal)}
         style={{ '--stamp-cols': member.goal <= 6 ? 3 : 4 } as React.CSSProperties}
       >
         {Array.from({ length: member.goal }, (_, i) => (
@@ -147,19 +154,23 @@ export function StampCard({ member }: { member: Member }) {
           <small> / {member.goal}</small>
         </strong>
         <span>
-          {member.goal - member.stamps} pause{member.goal - member.stamps > 1 ? 's' : ''} avant
-          votre cadeau
+          {member.goal - member.stamps} {t('pause')}
+          {lang === 'fr' && member.goal - member.stamps > 1 ? 's' : ''}{' '}
+          {t('avant votre cadeau')}{' '}
         </span>
       </div>
     </section>
   );
 }
 export function Rules({ program }: { program: Program }) {
+  const { t, lang } = useLoyaltyLanguage();
+
   return (
     <div className="loy-rules">
-      <h3>Une habitude qui fait plaisir.</h3>
+      <h3>{t('Une habitude qui fait plaisir.')}</h3>
       <p>
-        {program.goal} boissons payées en {program.window_days} jours à partir du premier tampon ={' '}
+        {program.goal} {t('boissons payées en')} {program.window_days}{' '}
+        {t('jours à partir du premier tampon =')}{' '}
         <strong>{program.reward_label.toLowerCase()}</strong>.
       </p>
       <p>
@@ -168,23 +179,30 @@ export function Rules({ program }: { program: Program }) {
           value: program.reward_value,
           maxPriceCents: program.max_price_cents,
         })}
-        . Cadeau valable {program.reward_days} jours à partir de son obtention, utilisable{' '}
-        {program.next_day ? 'dès le lendemain (heure de Grenoble)' : 'immédiatement'}. Après le
-        cadeau, une nouvelle carte commence au prochain tampon.
+        {t('. Cadeau valable')} {program.reward_days}{' '}
+        {t('jours à partir de son obtention, utilisable')}{' '}
+        {program.next_day ? t('dès le lendemain (heure de Grenoble)') : t('immédiatement')}
+        {t('. Après le cadeau, une nouvelle carte commence au prochain tampon.')}{' '}
       </p>
       <p>{program.eligible_text}</p>
       <p>
-        Carte personnelle. Les tampons expirés ne sont pas reportés. Les règles d’une carte
-        commencée restent identiques jusqu’à sa fin.
+        {t(
+          'Carte personnelle. Les tampons expirés ne sont pas reportés. Les règles d’une carte commencée restent identiques jusqu’à sa fin.',
+        )}{' '}
       </p>
     </div>
   );
 }
 export function History({ member }: { member: Member }) {
+  const { t, lang } = useLoyaltyLanguage();
+
   return (
     <details className="loy-history">
       <summary>
-        Mes dernières visites <span>{member.totalStamps} boissons au total</span>
+        {t('Mes dernières visites')}{' '}
+        <span>
+          {member.totalStamps} {t('boissons au total')}
+        </span>
       </summary>
       {member.history.length ? (
         <ul>
@@ -192,19 +210,19 @@ export function History({ member }: { member: Member }) {
             <li key={e.id}>
               <span>
                 {e.kind === 'stamp'
-                  ? `+${e.delta} tampon${e.delta > 1 ? 's' : ''}`
+                  ? t('+{0} tampon{1}', e.delta, e.delta > 1 ? 's' : '')
                   : e.kind === 'redeem'
-                    ? 'Cadeau utilisé'
+                    ? t('Cadeau utilisé')
                     : e.kind === 'recover'
-                      ? 'Accès à la carte renouvelé'
-                      : 'Opération annulée'}
+                      ? t('Accès à la carte renouvelé')
+                      : t('Opération annulée')}
               </span>
-              <time>{date(e.at)}</time>
+              <time>{date(e.at, lang)}</time>
             </li>
           ))}
         </ul>
       ) : (
-        <p>La première pause vous attend ☕</p>
+        <p>{t('La première pause vous attend ☕')}</p>
       )}
     </details>
   );

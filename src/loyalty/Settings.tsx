@@ -1,3 +1,4 @@
+import { useLoyaltyLanguage } from './i18n';
 import { useState, type FormEvent } from 'react';
 import { rpc, type Program } from './lib';
 
@@ -8,6 +9,8 @@ export default function LoyaltySettings({
   program: Program;
   onSave: (p: Program) => void;
 }) {
+  const { t } = useLoyaltyLanguage();
+
   const [draft, setDraft] = useState(program),
     [busy, setBusy] = useState(false),
     [error, setError] = useState(''),
@@ -33,11 +36,12 @@ export default function LoyaltySettings({
   }
   return (
     <form onSubmit={save} className="loy-settings loy-panel">
-      <span className="loy-eyebrow">VOTRE PROGRAMME, VOS RÈGLES</span>
-      <h2>Les petites attentions.</h2>
+      <span className="loy-eyebrow">{t('VOTRE PROGRAMME, VOS RÈGLES')}</span>
+      <h2>{t('Les petites attentions.')}</h2>
       <p>
-        Les nouveaux réglages s’appliquent aux prochaines cartes. Les cartes en cours et les cadeaux
-        déjà gagnés conservent leurs conditions.
+        {t(
+          'Les nouveaux réglages s’appliquent aux prochaines cartes. Les cartes en cours et les cadeaux déjà gagnés conservent leurs conditions.',
+        )}{' '}
       </p>
       <label className="loy-checkbox">
         <input
@@ -45,10 +49,10 @@ export default function LoyaltySettings({
           checked={draft.enabled}
           onChange={(e) => change('enabled', e.target.checked)}
         />
-        <span>Programme actif (inscriptions et nouveaux tampons)</span>
+        <span>{t('Programme actif (inscriptions et nouveaux tampons)')}</span>
       </label>
       <label>
-        Phrase d’accueil
+        {t('Phrase d’accueil')}{' '}
         <input
           value={draft.title}
           required
@@ -58,7 +62,7 @@ export default function LoyaltySettings({
       </label>
       <div className="loy-form-grid">
         <label>
-          Boissons pour obtenir un cadeau
+          {t('Boissons pour obtenir un cadeau')}{' '}
           <input
             type="number"
             required
@@ -69,7 +73,7 @@ export default function LoyaltySettings({
           />
         </label>
         <label>
-          Délai pour compléter une carte (jours)
+          {t('Délai pour compléter une carte (jours)')}{' '}
           <input
             type="number"
             required
@@ -80,18 +84,18 @@ export default function LoyaltySettings({
           />
         </label>
         <label>
-          Type de cadeau
+          {t('Type de cadeau')}{' '}
           <select
             value={draft.reward_kind}
             onChange={(e) => change('reward_kind', e.target.value as Program['reward_kind'])}
           >
-            <option value="drink">Boisson offerte</option>
-            <option value="percent">Réduction en %</option>
-            <option value="fixed">Réduction en €</option>
+            <option value="drink">{t('Boisson offerte')}</option>
+            <option value="percent">{t('Réduction en %')}</option>
+            <option value="fixed">{t('Réduction en €')}</option>
           </select>
         </label>
         <label>
-          Nom du cadeau
+          {t('Nom du cadeau')}{' '}
           <input
             value={draft.reward_label}
             maxLength={120}
@@ -102,8 +106,8 @@ export default function LoyaltySettings({
         {draft.reward_kind !== 'drink' && (
           <label>
             {draft.reward_kind === 'percent'
-              ? 'Pourcentage de réduction'
-              : 'Montant de réduction (€)'}
+              ? t('Pourcentage de réduction')
+              : t('Montant de réduction (€)')}
             <input
               type="number"
               required
@@ -122,7 +126,7 @@ export default function LoyaltySettings({
         )}
         {draft.reward_kind === 'drink' && (
           <label>
-            Prix maximum offert (€ ; 0 = sans plafond)
+            {t('Prix maximum offert (€ ; 0 = sans plafond)')}{' '}
             <input
               type="number"
               required
@@ -135,7 +139,7 @@ export default function LoyaltySettings({
           </label>
         )}
         <label>
-          Validité du cadeau (jours depuis obtention)
+          {t('Validité du cadeau (jours depuis obtention)')}{' '}
           <input
             type="number"
             min={1}
@@ -146,7 +150,7 @@ export default function LoyaltySettings({
           />
         </label>
         <label>
-          Maximum de tampons par carte et par jour
+          {t('Maximum de tampons par carte et par jour')}{' '}
           <input
             type="number"
             min={1}
@@ -163,10 +167,12 @@ export default function LoyaltySettings({
           checked={draft.next_day}
           onChange={(e) => change('next_day', e.target.checked)}
         />
-        <span>Cadeau utilisable dès le lendemain, à minuit à Grenoble (sinon immédiatement)</span>
+        <span>
+          {t('Cadeau utilisable dès le lendemain, à minuit à Grenoble (sinon immédiatement)')}
+        </span>
       </label>
       <label>
-        Boissons éligibles et conditions
+        {t('Boissons éligibles et conditions')}{' '}
         <textarea
           maxLength={500}
           required
@@ -176,21 +182,22 @@ export default function LoyaltySettings({
         />
       </label>
       <p className="loy-field-help">
-        Une boisson payée = un tampon. Le contrôle des achats se fait en caisse ; aucune connexion
-        automatique à votre caisse enregistreuse.
+        {t(
+          'Une boisson payée = un tampon. Le contrôle des achats se fait en caisse ; aucune connexion automatique à votre caisse enregistreuse.',
+        )}{' '}
       </p>
       {error && (
         <p role="alert" className="loy-alert">
-          {error}
+          {t(error)}
         </p>
       )}
       {saved && (
         <p role="status" className="loy-notice">
-          Les règles ont été enregistrées.
+          {t('Les règles ont été enregistrées.')}{' '}
         </p>
       )}
       <button className="loy-button" disabled={busy}>
-        {busy ? 'Enregistrement…' : 'Enregistrer le programme'}
+        {busy ? t('Enregistrement…') : t('Enregistrer le programme')}
       </button>
     </form>
   );

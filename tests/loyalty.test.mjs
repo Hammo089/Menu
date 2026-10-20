@@ -31,6 +31,7 @@ test('loyalty capabilities, permissions, accounting, snapshots, recovery and era
   await db.exec(
     readFileSync(new URL('../supabase/loyalty-hardening.sql', import.meta.url), 'utf8'),
   );
+  await db.exec(readFileSync(new URL('../supabase/loyalty-login.sql', import.meta.url), 'utf8'));
   async function role(id) {
     await db.exec('reset role');
     await db.query("select set_config('request.jwt.claim.sub',$1,false)", [id || '']);
@@ -67,6 +68,37 @@ test('loyalty capabilities, permissions, accounting, snapshots, recovery and era
     consent: true,
   });
   const code = result.member.code;
+  const deviceKey = 'c'.repeat(64);
+  const login = async (payload) =>
+    (await db.query('select public.loyalty_login($1::jsonb) as result', [JSON.stringify(payload)]))
+      .rows[0].result;
+  assert.match(
+    (await login({ name: 'Wrong name', phone: '0611223344', key: deviceKey })).error,
+    /incorrect/,
+  );
+  const signedIn = await login({
+    name: '  CAMILLE   MARTIN ',
+    phone: '0033 6 11 22 33 44',
+    key: deviceKey,
+  });
+  assert.equal(signedIn.member.code, code);
+  assert.equal(signedIn.member.phone, undefined);
+  assert.equal((await rpc('card', { key: deviceKey })).member.code, code);
+  assert.equal(
+    (await rpc('card', { key })).member.code,
+    code,
+    'login must not disconnect other devices',
+  );
+  await assert.rejects(
+    db.query("select blanco_private.loyalty_api_base('program','{}')"),
+    /permission denied/,
+  );
+  for (let i = 0; i < 11; i++)
+    await login({ name: 'Unknown person', phone: '0600000099', key: deviceKey });
+  assert.match(
+    (await login({ name: 'Unknown person', phone: '0600000099', key: deviceKey })).error,
+    /tentatives/,
+  );
   assert.equal(result.member.phone, undefined);
   assert.equal(result.member.id, undefined);
   assert.equal(result.member.goal, 8);
@@ -144,6 +176,7 @@ test('loyalty capabilities, permissions, accounting, snapshots, recovery and era
   await rpc('recover', { code, key: secondKey, last4: '3344', verified: true });
   await role();
   await assert.rejects(rpc('card', { key }), /introuvable/);
+  await assert.rejects(rpc('card', { key: deviceKey }), /introuvable/);
   assert.equal((await rpc('card', { key: secondKey })).member.stamps, 3);
   await role(employee);
   await assert.rejects(rpc('access'), /réservé/);

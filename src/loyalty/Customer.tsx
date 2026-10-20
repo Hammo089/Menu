@@ -51,6 +51,9 @@ export default function CustomerLoyalty() {
   const [key, setKey] = useState<string | null>(initialKey);
   const [member, setMember] = useState<Member | null>(() => initialCard(initialKey()));
   const [program, setProgram] = useState<Program | null>(null);
+  const [entryMode, setEntryMode] = useState<'register' | 'login'>(() =>
+    new URLSearchParams(location.search).get('connexion') === '1' ? 'login' : 'register',
+  );
   const [loading, setLoading] = useState(true),
     [busy, setBusy] = useState(false),
     [error, setError] = useState('');
@@ -186,7 +189,7 @@ export default function CustomerLoyalty() {
     setError('');
     const form = new FormData(e.currentTarget);
     try {
-      const result = await rpc('register', {
+      const result = await rpc(entryMode === 'login' ? 'login' : 'register', {
         key: registrationKey.current,
         name: form.get('name'),
         phone: form.get('phone'),
@@ -202,13 +205,29 @@ export default function CustomerLoyalty() {
       setProgram(result.program);
       setKey(registrationKey.current);
       setOffline(false);
-      setNotice('Bienvenue au club ! Enregistrez votre carte pour la retrouver facilement.');
-      setModal('save');
+      setNotice(
+        entryMode === 'login'
+          ? 'Heureux de vous retrouver ! Vos tampons et vos cadeaux sont toujours là.'
+          : 'Bienvenue au club ! Enregistrez votre carte pour la retrouver facilement.',
+      );
+      if (entryMode === 'register') setModal('save');
     } catch (e) {
       setError((e as Error).message);
     } finally {
       setBusy(false);
     }
+  }
+  function showLogin() {
+    storageSet(CARD_KEY, null);
+    storageSet(CACHE_KEY, null);
+    setKey(null);
+    setMember(null);
+    setEntryMode('login');
+    setError('');
+    setNotice('');
+    setModal(null);
+    history.replaceState(null, '', '/fidelite');
+    void fetch('/api/loyalty-session', { method: 'DELETE' }).catch(() => {});
   }
   async function copyLink() {
     if (!key) return;
@@ -247,6 +266,11 @@ export default function CustomerLoyalty() {
       </header>
       {consentPage ? (
         <main className="loy-legal">
+          <p>
+            Vous pouvez rouvrir votre carte avec votre nom enregistré et votre téléphone, sans mot
+            de passe ni SMS. Ces informations ne prouvent pas la possession du numéro. Seule
+            l’équipe peut ajouter des tampons ou utiliser un cadeau.
+          </p>
           <span className="loy-eyebrow">EN TOUTE TRANSPARENCE</span>
           <h1>
             Votre pause.
@@ -416,18 +440,45 @@ export default function CustomerLoyalty() {
               <div className="loy-panel">
                 <h2>Retrouvons votre carte.</h2>
                 <p>
-                  Si ce lien a été remplacé, notre équipe peut vous redonner accès avec votre nom et
-                  votre téléphone.
+                  Entrez votre nom et votre téléphone pour retrouver vos tampons et vos cadeaux.
                 </p>
-                <button className="loy-secondary" onClick={() => setModal('forget')}>
-                  Utiliser une autre carte sur cet appareil
+                <button className="loy-secondary" onClick={showLogin}>
+                  Me connecter avec mon nom et mon téléphone
                 </button>
               </div>
             ) : (
               <form className="loy-signup loy-panel" onSubmit={register}>
+                <div className="loy-entry-tabs" role="group" aria-label="Accès à ma carte">
+                  <button
+                    type="button"
+                    className={entryMode === 'register' ? 'active' : ''}
+                    onClick={() => {
+                      setEntryMode('register');
+                      setError('');
+                    }}
+                  >
+                    Créer ma carte
+                  </button>
+                  <button
+                    type="button"
+                    className={entryMode === 'login' ? 'active' : ''}
+                    onClick={() => {
+                      setEntryMode('login');
+                      setError('');
+                    }}
+                  >
+                    J’ai déjà une carte
+                  </button>
+                </div>
                 <span className="loy-eyebrow">BIENVENUE AU BLANCO CLUB</span>
-                <h2>On fait connaissance ?</h2>
-                <p>Deux petites infos, et votre prochaine pause compte déjà.</p>
+                <h2>
+                  {entryMode === 'login' ? 'Heureux de vous revoir.' : 'On fait connaissance ?'}
+                </h2>
+                <p>
+                  {entryMode === 'login'
+                    ? 'Votre nom enregistré et votre téléphone suffisent pour retrouver votre carte.'
+                    : 'Deux petites infos, et votre prochaine pause compte déjà.'}
+                </p>
                 <label>
                   Votre nom et prénom
                   <input
@@ -452,33 +503,45 @@ export default function CustomerLoyalty() {
                   />
                 </label>
                 <p className="loy-field-help">
-                  Il sert uniquement à retrouver votre carte au comptoir. Aucun SMS publicitaire.
+                  {entryMode === 'login'
+                    ? 'Saisissez exactement le nom de votre inscription. Aucun mot de passe ni SMS nécessaire.'
+                    : 'Votre nom et votre téléphone permettent aussi de rouvrir votre carte. Aucun SMS publicitaire.'}
                 </p>
                 <label className="loy-honeypot" aria-hidden="true">
                   Votre site
                   <input name="website" tabIndex={-1} autoComplete="off" />
                 </label>
-                <label className="loy-checkbox">
-                  <input type="checkbox" name="consent" required />
-                  <span>
-                    J’accepte les{' '}
-                    <a href="/fidelite/confidentialite" target="_blank" rel="noreferrer">
-                      conditions du programme et l’utilisation de mes données
-                    </a>{' '}
-                    pour gérer ma carte.
-                  </span>
-                </label>
-                <button className="loy-button" disabled={busy || !program?.enabled}>
+                {entryMode === 'register' && (
+                  <label className="loy-checkbox">
+                    <input type="checkbox" name="consent" required />
+                    <span>
+                      J’accepte les{' '}
+                      <a href="/fidelite/confidentialite" target="_blank" rel="noreferrer">
+                        conditions du programme et l’utilisation de mes données
+                      </a>{' '}
+                      pour gérer ma carte.
+                    </span>
+                  </label>
+                )}
+                <button
+                  className="loy-button"
+                  disabled={busy || (entryMode === 'register' && !program?.enabled)}
+                >
                   {busy
-                    ? 'Création de votre carte…'
-                    : program && !program.enabled
-                      ? 'Inscriptions en pause'
-                      : 'Créer ma carte gratuite'}
+                    ? entryMode === 'login'
+                      ? 'Ouverture de votre carte…'
+                      : 'Création de votre carte…'
+                    : entryMode === 'login'
+                      ? 'Retrouver ma carte'
+                      : program && !program.enabled
+                        ? 'Inscriptions en pause'
+                        : 'Créer ma carte gratuite'}
                   <ArrowRight size={18} />
                 </button>
                 <p className="loy-field-help">
-                  Déjà une carte ? Demandez à notre équipe de la retrouver. Ne créez pas un second
-                  compte.
+                  {entryMode === 'login'
+                    ? 'Vous avez changé de numéro ou oublié le nom enregistré ? Notre équipe peut vous aider au comptoir.'
+                    : 'Déjà inscrit ? Utilisez « J’ai déjà une carte » pour retrouver vos tampons.'}
                 </p>
               </form>
             )}
@@ -490,7 +553,7 @@ export default function CustomerLoyalty() {
         <span>Blanco Club · Grenoble</span>
         <a href="/fidelite/confidentialite">Conditions & confidentialité</a>
         {key && !consentPage && (
-          <button onClick={() => setModal('forget')}>Retirer la carte de cet appareil</button>
+          <button onClick={() => setModal('forget')}>Me déconnecter de cet appareil</button>
         )}
       </footer>
       {modal === 'qr' && member && (
@@ -549,21 +612,25 @@ export default function CustomerLoyalty() {
         </Modal>
       )}
       {modal === 'forget' && (
-        <Modal title="Retirer cette carte ?" onClose={() => setModal(null)}>
+        <Modal title="Vous déconnecter de cet appareil ?" onClose={() => setModal(null)}>
           <p>
-            Votre compte et vos tampons restent chez Blanco. Assurez-vous d’avoir gardé votre lien
-            privé avant de retirer la carte de cet appareil.
+            Votre compte, vos tampons et vos cadeaux restent chez Blanco. Pour revenir, saisissez
+            simplement votre nom enregistré et votre téléphone dans « J’ai déjà une carte ».
           </p>
           <button
             className="loy-danger"
-            onClick={() => {
+            onClick={async () => {
               storageSet(CARD_KEY, null);
               storageSet(CACHE_KEY, null);
-              void fetch('/api/loyalty-session', { method: 'DELETE' });
-              location.replace('/fidelite');
+              await fetch('/api/loyalty-session', {
+                method: 'DELETE',
+                keepalive: true,
+                signal: AbortSignal.timeout(5000),
+              }).catch(() => {});
+              location.replace('/fidelite?connexion=1');
             }}
           >
-            Retirer de cet appareil
+            Me déconnecter
           </button>
         </Modal>
       )}

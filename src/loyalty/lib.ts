@@ -81,7 +81,10 @@ export async function rpc(action: string, payload: Record<string, unknown> = {})
     throw new Error('Le service fidélité est indisponible. Réessayez dans un instant.');
   if (!navigator.onLine) throw new Error('Connexion nécessaire. Aucun changement n’a été envoyé.');
   const { data, error } = await supabase
-    .rpc('loyalty_api', { action, payload })
+    .rpc(
+      action === 'login' ? 'loyalty_login' : 'loyalty_api',
+      action === 'login' ? { payload } : { action, payload },
+    )
     .abortSignal(AbortSignal.timeout(15000));
   if (error) {
     if (error.code === 'P0001') throw Object.assign(new Error(error.message), { definitive: true });
@@ -89,10 +92,11 @@ export async function rpc(action: string, payload: Record<string, unknown> = {})
       'La connexion n’a pas abouti. Réessayez : une opération ne sera comptée qu’une fois.',
     );
   }
+  if (data?.error) throw Object.assign(new Error(data.error), { definitive: true });
   return data as Result;
 }
-export const date = (value: string) =>
-  new Intl.DateTimeFormat('fr-FR', {
+export const date = (value: string, language: 'ar' | 'fr' = 'fr') =>
+  new Intl.DateTimeFormat(language === 'ar' ? 'ar-FR' : 'fr-FR', {
     day: 'numeric',
     month: 'short',
     year: 'numeric',

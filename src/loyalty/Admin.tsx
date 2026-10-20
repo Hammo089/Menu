@@ -1,3 +1,4 @@
+import { useLoyaltyLanguage, LoyaltyLanguageProvider, FrenchLoyaltyContent } from './i18n';
 import { lazy, Suspense, useCallback, useEffect, useRef, useState, type FormEvent } from 'react';
 import {
   ArrowLeft,
@@ -51,7 +52,17 @@ function restoredOperation(): PendingOperation | null {
   }
 }
 
-export default function LoyaltyAdmin() {
+function LoyaltyAdminContent() {
+  const { t, lang, setLang } = useLoyaltyLanguage();
+
+  useEffect(() => {
+    document.documentElement.lang = lang;
+    document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+    document.title = t('Blanco — Gestion fidélité');
+    return () => {
+      document.documentElement.dir = 'ltr';
+    };
+  }, [lang]);
   const [auth, setAuth] = useState<'loading' | 'login' | 'denied' | 'ready'>('loading');
   const [owner, setOwner] = useState(false),
     [program, setProgram] = useState<Program | null>(null);
@@ -120,8 +131,6 @@ export default function LoyaltyAdmin() {
     }
   }, [query, offset]);
   useEffect(() => {
-    document.documentElement.lang = 'fr';
-    document.title = 'Blanco — Gestion fidélité';
     if (!supabase) {
       setAuth('login');
       setError('Le service fidélité n’est pas configuré.');
@@ -236,18 +245,30 @@ export default function LoyaltyAdmin() {
     void load();
   };
   return (
-    <div className="loyalty-app loy-admin">
+    <div className="loyalty-app loy-admin" dir={lang === 'ar' ? 'rtl' : 'ltr'} lang={lang}>
       <header className="loy-header">
         <a href="/admin" className="loy-wordmark">
-          Blanco<span>ESPACE FIDÉLITÉ</span>
+          Blanco<span>{t('ESPACE FIDÉLITÉ')}</span>
         </a>
         <div className="loy-actions">
+          <div
+            className="loy-language-switch"
+            role="group"
+            aria-label={lang === 'ar' ? 'لغة لوحة الإدارة' : 'Langue de gestion'}
+          >
+            <button className={lang === 'ar' ? 'active' : ''} onClick={() => setLang('ar')}>
+              عربي
+            </button>
+            <button className={lang === 'fr' ? 'active' : ''} onClick={() => setLang('fr')}>
+              FR
+            </button>
+          </div>
           <a href="/admin" className="loy-link">
-            <ArrowLeft size={15} /> Gestion du menu
+            <ArrowLeft size={15} /> {t('Gestion du menu')}{' '}
           </a>
           {auth === 'ready' && (
             <button className="loy-link" onClick={() => void supabase?.auth.signOut()}>
-              <LogOut size={16} /> Déconnexion
+              <LogOut size={16} /> {t('Déconnexion')}{' '}
             </button>
           )}
         </div>
@@ -257,37 +278,41 @@ export default function LoyaltyAdmin() {
           <ShieldCheck size={32} />
           <h1>
             {auth === 'loading'
-              ? 'Un instant…'
+              ? t('Un instant…')
               : auth === 'denied'
-                ? 'Accès réservé à l’équipe.'
-                : 'Bonjour, l’équipe.'}
+                ? t('Accès réservé à l’équipe.')
+                : t('Bonjour, l’équipe.')}
           </h1>
           {auth === 'denied' ? (
             <>
-              <p>Ce compte n’a pas accès à la fidélité. Demandez au responsable de l’autoriser.</p>
+              <p>
+                {t(
+                  'Ce compte n’a pas accès à la fidélité. Demandez au responsable de l’autoriser.',
+                )}
+              </p>
               <button className="loy-button" onClick={() => void supabase?.auth.signOut()}>
-                Changer de compte
+                {t('Changer de compte')}{' '}
               </button>
             </>
           ) : auth === 'login' ? (
             <form onSubmit={login}>
-              <p>Connectez-vous avec votre compte de gestion Blanco.</p>
+              <p>{t('Connectez-vous avec votre compte de gestion Blanco.')}</p>
               <label>
-                Adresse e-mail
+                {t('Adresse e-mail')}{' '}
                 <input type="email" name="email" autoComplete="username" required />
               </label>
               <label>
-                Mot de passe
+                {t('Mot de passe')}{' '}
                 <input type="password" name="password" autoComplete="current-password" required />
               </label>
               <button className="loy-button" disabled={busy}>
-                {busy ? 'Connexion…' : 'Se connecter'}
+                {busy ? t('Connexion…') : t('Se connecter')}
               </button>
             </form>
           ) : null}
           {error && (
             <p role="alert" className="loy-alert">
-              {error}
+              {t(error)}
             </p>
           )}
         </main>
@@ -295,21 +320,21 @@ export default function LoyaltyAdmin() {
         <main className="loy-admin-main">
           <div className="loy-admin-intro">
             <div>
-              <span className="loy-eyebrow">BLANCO CLUB · GRENOBLE</span>
-              <h1>Chaque visite compte.</h1>
-              <p>Un scan, un sourire, une petite attention.</p>
+              <span className="loy-eyebrow">{t('BLANCO CLUB · GRENOBLE')}</span>
+              <h1>{t('Chaque visite compte.')}</h1>
+              <p>{t('Un scan, un sourire, une petite attention.')}</p>
             </div>
             <a className="loy-secondary" href="/fidelite" target="_blank" rel="noreferrer">
-              Voir la carte client <ArrowRight size={16} />
+              {t('Voir la carte client')} <ArrowRight size={16} />
             </a>
           </div>
-          <nav className="loy-admin-tabs" aria-label="Gestion fidélité">
+          <nav className="loy-admin-tabs" aria-label={t('Gestion fidélité')}>
             {(
               [
-                { id: 'clients', label: 'Clients & caisse', icon: Users },
-                ...(owner ? [{ id: 'settings', label: 'Programme', icon: Settings2 }] : []),
-                { id: 'poster', label: 'QR d’inscription', icon: QrCode },
-                ...(owner ? [{ id: 'staff', label: 'Équipe', icon: ShieldCheck }] : []),
+                { id: 'clients', label: t('Clients & caisse'), icon: Users },
+                ...(owner ? [{ id: 'settings', label: t('Programme'), icon: Settings2 }] : []),
+                { id: 'poster', label: t('QR d’inscription'), icon: QrCode },
+                ...(owner ? [{ id: 'staff', label: t('Équipe'), icon: ShieldCheck }] : []),
               ] as const
             ).map((t) => (
               <button
@@ -328,21 +353,21 @@ export default function LoyaltyAdmin() {
           </nav>
           {error && (
             <div role="alert" className="loy-alert">
-              {error}
+              {t(error)}
             </div>
           )}
           {notice && (
             <p role="status" className="loy-notice">
               <Check size={16} />
-              {notice}
+              {t(notice)}
             </p>
           )}
           {pending && !busy && (
             <div className="loy-offline" role="status">
-              Opération en attente sur la carte {String(pending.payload.code)}. Réessayez avec le
-              même identifiant : elle ne sera pas comptée deux fois.{' '}
+              {t('Opération en attente sur la carte')} {String(pending.payload.code)}
+              {t('. Réessayez avec le même identifiant : elle ne sera pas comptée deux fois.')}{' '}
               <button className="loy-secondary" onClick={() => void executeOperation(pending)}>
-                Vérifier et réessayer
+                {t('Vérifier et réessayer')}{' '}
               </button>
             </div>
           )}
@@ -351,38 +376,44 @@ export default function LoyaltyAdmin() {
           )}
           {tab === 'poster' && (
             <section className="loy-poster loy-panel">
-              <span className="loy-eyebrow">À POSER PRÈS DE LA CAISSE</span>
-              <h2>
-                Un café aujourd’hui.
-                <br />
-                Une attention demain.
+              <span className="loy-eyebrow">{t('À POSER PRÈS DE LA CAISSE')}</span>
+              <h2 lang="fr" dir="ltr">
+                Un café aujourd’hui. <br />
+                Une attention demain.{' '}
               </h2>
-              <p>Scannez. Inscrivez-vous. Cumulez vos petits bonheurs.</p>
+              <p lang="fr" dir="ltr">
+                Scannez. Inscrivez-vous. Cumulez vos petits bonheurs.
+              </p>
               <QR
                 value={`${location.origin}/fidelite`}
-                label="QR pour s’inscrire au programme fidélité"
+                label={t('QR pour s’inscrire au programme fidélité')}
                 download
               />
               <a className="loy-link" href="/fidelite">
                 {location.origin}/fidelite
               </a>
-              {program && <Rules program={program} />}
+              {program && (
+                <FrenchLoyaltyContent>
+                  <Rules program={program} />
+                </FrenchLoyaltyContent>
+              )}
               <button className="loy-button loy-no-print" onClick={() => window.print()}>
-                Imprimer l’affiche
+                {t('Imprimer l’affiche')}{' '}
               </button>
             </section>
           )}
           {tab === 'staff' && owner && (
             <section className="loy-panel">
-              <h2>Une équipe de confiance.</h2>
+              <h2>{t('Une équipe de confiance.')}</h2>
               <p>
-                Les équipiers peuvent chercher une carte, ajouter des tampons, utiliser un cadeau et
-                annuler leur dernière opération pendant 15 minutes. Le responsable garde les
-                réglages, la récupération et la suppression des comptes.
+                {t(
+                  'Les équipiers peuvent chercher une carte, ajouter des tampons, utiliser un cadeau et annuler leur dernière opération pendant 15 minutes. Le responsable garde les réglages, la récupération et la suppression des comptes.',
+                )}{' '}
               </p>
               <p>
-                Créez d’abord le compte confirmé dans Supabase → Authentication → Users, puis
-                autorisez son e-mail ici. Les identifiants ne se partagent pas.
+                {t(
+                  'Créez d’abord le compte confirmé dans Supabase → Authentication → Users, puis autorisez son e-mail ici. Les identifiants ne se partagent pas.',
+                )}{' '}
               </p>
               <form
                 className="loy-inline-form"
@@ -403,11 +434,10 @@ export default function LoyaltyAdmin() {
                 }}
               >
                 <label>
-                  E-mail de l’équipier
-                  <input type="email" name="email" required />
+                  {t('E-mail de l’équipier')} <input type="email" name="email" required />
                 </label>
                 <button className="loy-button" disabled={busy}>
-                  Autoriser
+                  {t('Autoriser')}{' '}
                 </button>
               </form>
               <ul className="loy-staff-list">
@@ -415,7 +445,7 @@ export default function LoyaltyAdmin() {
                   <li key={s.email}>
                     <span>
                       {s.email}
-                      <small>{s.active ? 'Autorisé' : 'Accès suspendu'}</small>
+                      <small>{s.active ? t('Autorisé') : t('Accès suspendu')}</small>
                     </span>
                     <button
                       className="loy-secondary"
@@ -432,7 +462,7 @@ export default function LoyaltyAdmin() {
                         }
                       }}
                     >
-                      {s.active ? 'Suspendre' : 'Réactiver'}
+                      {s.active ? t('Suspendre') : t('Réactiver')}
                     </button>
                   </li>
                 ))}
@@ -443,25 +473,27 @@ export default function LoyaltyAdmin() {
             (selected ? (
               <>
                 <button className="loy-link loy-back" onClick={reset}>
-                  <ArrowLeft size={16} /> Tous les clients
+                  <ArrowLeft size={16} /> {t('Tous les clients')}{' '}
                 </button>
                 <div className="loy-member-layout">
                   <div>
                     <div className="loy-panel loy-member-info">
-                      <span className="loy-eyebrow">CARTE CLIENT</span>
+                      <span className="loy-eyebrow">{t('CARTE CLIENT')}</span>
                       <h2>{selected.name}</h2>
                       <p>
-                        {selected.phone} <span>· {selected.code}</span>
+                        <bdi>{selected.phone}</bdi> <span>· {selected.code}</span>
                       </p>
-                      <p className="loy-field-help">Inscrit le {date(selected.createdAt)}</p>
+                      <p className="loy-field-help">
+                        {t('Inscrit le')} {date(selected.createdAt, lang)}
+                      </p>
                     </div>
                     <StampCard member={selected} />
                     <History member={selected} />
                   </div>
                   <div className="loy-member-actions">
                     <section className="loy-panel">
-                      <span className="loy-eyebrow">APRÈS LE PAIEMENT</span>
-                      <h2>Une pause de plus.</h2>
+                      <span className="loy-eyebrow">{t('APRÈS LE PAIEMENT')}</span>
+                      <h2>{t('Une pause de plus.')}</h2>
                       <form
                         onSubmit={(e) => {
                           e.preventDefault();
@@ -469,7 +501,7 @@ export default function LoyaltyAdmin() {
                         }}
                       >
                         <label>
-                          Nombre de boissons payées
+                          {t('Nombre de boissons payées')}{' '}
                           <input
                             type="number"
                             min={1}
@@ -487,69 +519,73 @@ export default function LoyaltyAdmin() {
                             onChange={(e) => setPaid(e.target.checked)}
                           />
                           <span>
-                            J’ai vérifié les boissons payées et éligibles. Les boissons offertes ne
-                            comptent pas.
+                            {t(
+                              'J’ai vérifié les boissons payées et éligibles. Les boissons offertes ne comptent pas.',
+                            )}{' '}
                           </span>
                         </label>
                         <button className="loy-button" disabled={busy || !program?.enabled}>
                           <Coffee size={18} />
                           {busy
-                            ? 'Enregistrement…'
-                            : `Ajouter ${amount} tampon${amount > 1 ? 's' : ''}`}
+                            ? t('Enregistrement…')
+                            : t('Ajouter {0} tampon{1}', amount, amount > 1 ? 's' : '')}
                         </button>
                       </form>
                       {!program?.enabled && (
                         <p className="loy-alert">
-                          Le programme est en pause. Les cadeaux déjà gagnés restent utilisables.
+                          {t(
+                            'Le programme est en pause. Les cadeaux déjà gagnés restent utilisables.',
+                          )}{' '}
                         </p>
                       )}
                       {selected.cycleExpiresAt && (
                         <p className="loy-field-help">
-                          Carte à compléter avant le {date(selected.cycleExpiresAt)}.
+                          {t('Carte à compléter avant le')} {date(selected.cycleExpiresAt, lang)}.
                         </p>
                       )}
                     </section>
                     <section className="loy-panel">
-                      <span className="loy-eyebrow">LE PLAISIR D’OFFRIR</span>
-                      <h2>Ses cadeaux.</h2>
+                      <span className="loy-eyebrow">{t('LE PLAISIR D’OFFRIR')}</span>
+                      <h2>{t('Ses cadeaux.')}</h2>
                       {!selected.rewards.length && (
-                        <p>Encore quelques pauses avant le premier cadeau.</p>
+                        <p>{t('Encore quelques pauses avant le premier cadeau.')}</p>
                       )}
                       {selected.rewards.map((r) => (
                         <article key={r.id} className={`loy-staff-reward ${r.status}`}>
                           <Gift size={23} />
                           <div>
                             <h3>{r.label}</h3>
-                            <p>{rewardDescription(r)}</p>
+                            <p>{t(rewardDescription(r))}</p>
                             <small>
                               {r.status === 'used'
-                                ? 'Déjà utilisé'
+                                ? t('Déjà utilisé')
                                 : r.status === 'expired'
-                                  ? 'Expiré'
+                                  ? t('Expiré')
                                   : r.status === 'soon'
-                                    ? `Disponible le ${date(r.availableAt)}`
-                                    : `Valable jusqu’au ${date(r.expiresAt)}`}
+                                    ? t('Disponible le {0}', date(r.availableAt, lang))
+                                    : t('Valable jusqu’au {0}', date(r.expiresAt, lang))}
                             </small>
                             {r.status === 'ready' &&
                               (confirmReward === r.id ? (
                                 <div className="loy-confirm">
                                   <p>
-                                    Confirmer la remise du cadeau au client ? Aucun tampon ne sera
-                                    ajouté.
+                                    {t(
+                                      'Confirmer la remise du cadeau au client ? Aucun tampon ne sera ajouté.',
+                                    )}{' '}
                                   </p>
                                   <button
                                     className="loy-button"
                                     disabled={busy}
                                     onClick={() => void mutate('redeem', { rewardId: r.id })}
                                   >
-                                    Confirmer l’utilisation
+                                    {t('Confirmer l’utilisation')}{' '}
                                   </button>
                                   <button
                                     className="loy-link"
                                     disabled={busy}
                                     onClick={() => setConfirmReward(null)}
                                   >
-                                    Annuler
+                                    {t('Annuler')}{' '}
                                   </button>
                                 </div>
                               ) : (
@@ -558,7 +594,7 @@ export default function LoyaltyAdmin() {
                                   disabled={busy}
                                   onClick={() => setConfirmReward(r.id)}
                                 >
-                                  Utiliser ce cadeau
+                                  {t('Utiliser ce cadeau')}{' '}
                                 </button>
                               ))}
                           </div>
@@ -570,19 +606,20 @@ export default function LoyaltyAdmin() {
                         className="loy-secondary"
                         disabled={busy}
                         onClick={() => {
-                          if (confirm('Annuler la dernière opération sur cette carte ?'))
+                          if (confirm(t('Annuler la dernière opération sur cette carte ?')))
                             void mutate('undo', { eventId: selected.lastEvent!.id });
                         }}
                       >
-                        <Undo2 size={17} /> Annuler la dernière opération (15 min)
+                        <Undo2 size={17} /> {t('Annuler la dernière opération (15 min)')}{' '}
                       </button>
                     )}
                     {owner && (
                       <details className="loy-panel">
-                        <summary>Assistance & données du client</summary>
+                        <summary>{t('Assistance & données du client')}</summary>
                         <p>
-                          Vérifiez toujours l’identité du client au comptoir avant de renouveler son
-                          accès.
+                          {t(
+                            'Vérifiez toujours l’identité du client au comptoir avant de renouveler son accès.',
+                          )}{' '}
                         </p>
                         <div className="loy-actions">
                           <button
@@ -593,14 +630,14 @@ export default function LoyaltyAdmin() {
                               setModal('recover');
                             }}
                           >
-                            Retrouver son accès
+                            {t('Retrouver son accès')}{' '}
                           </button>
                           <button
                             className="loy-danger"
                             disabled={busy}
                             onClick={() => setModal('erase')}
                           >
-                            Supprimer ses données
+                            {t('Supprimer ses données')}{' '}
                           </button>
                         </div>
                       </details>
@@ -613,10 +650,10 @@ export default function LoyaltyAdmin() {
                 <div className="loy-stats">
                   {stats &&
                     [
-                      ['Clients', stats.members],
-                      ['Boissons fidélisées', stats.stamps],
-                      ['Cadeaux à utiliser', stats.ready],
-                      ['Cadeaux savourés', stats.redeemed],
+                      [t('Clients'), stats.members],
+                      [t('Boissons fidélisées'), stats.stamps],
+                      [t('Cadeaux à utiliser'), stats.ready],
+                      [t('Cadeaux savourés'), stats.redeemed],
                     ].map(([label, value]) => (
                       <div key={label}>
                         <strong>{Number(value).toLocaleString('fr-FR')}</strong>
@@ -626,9 +663,9 @@ export default function LoyaltyAdmin() {
                 </div>
                 <div className="loy-cashier-layout">
                   <section className="loy-panel">
-                    <span className="loy-eyebrow">LE GESTE SIMPLE EN CAISSE</span>
-                    <h2>Bonjour, les habitués.</h2>
-                    <Suspense fallback={<p>Préparation de la caméra…</p>}>
+                    <span className="loy-eyebrow">{t('LE GESTE SIMPLE EN CAISSE')}</span>
+                    <h2>{t('Bonjour, les habitués.')}</h2>
+                    <Suspense fallback={<p>{t('Préparation de la caméra…')}</p>}>
                       <Scanner onScan={(code) => void open(code)} />
                     </Suspense>
                     <form
@@ -644,7 +681,7 @@ export default function LoyaltyAdmin() {
                       }}
                     >
                       <label>
-                        Ou saisir le code de la carte
+                        {t('Ou saisir le code de la carte')}{' '}
                         <input
                           value={manual}
                           onChange={(e) => setManual(e.target.value.toUpperCase())}
@@ -654,18 +691,18 @@ export default function LoyaltyAdmin() {
                         />
                       </label>
                       <button className="loy-button" disabled={busy}>
-                        Ouvrir
+                        {t('Ouvrir')}{' '}
                       </button>
                     </form>
                   </section>
                   <section className="loy-panel">
-                    <span className="loy-eyebrow">UNE CARTE ÉGARÉE ?</span>
-                    <h2>Retrouver un client.</h2>
+                    <span className="loy-eyebrow">{t('UNE CARTE ÉGARÉE ?')}</span>
+                    <h2>{t('Retrouver un client.')}</h2>
                     <label className="loy-search">
                       <Search size={18} />
                       <input
-                        aria-label="Rechercher un client"
-                        placeholder="Nom, téléphone ou code…"
+                        aria-label={t('Rechercher un client')}
+                        placeholder={t('Nom, téléphone ou code…')}
                         value={query}
                         onChange={(e) => {
                           setQuery(e.target.value);
@@ -674,8 +711,9 @@ export default function LoyaltyAdmin() {
                       />
                     </label>
                     <p className="loy-field-help">
-                      Recherche par nom ou par au moins 4 chiffres du téléphone. Vérifiez les
-                      homonymes avec le numéro.
+                      {t(
+                        'Recherche par nom ou par au moins 4 chiffres du téléphone. Vérifiez les homonymes avec le numéro.',
+                      )}{' '}
                     </p>
                     <div className="loy-client-list" aria-busy={searching}>
                       {members.map((m) => (
@@ -683,17 +721,19 @@ export default function LoyaltyAdmin() {
                           <span className="loy-avatar">{m.name[0].toUpperCase()}</span>
                           <span>
                             <strong>{m.name}</strong>
-                            <small>{m.phone}</small>
                             <small>
-                              {m.stamps}/{m.goal} tampons{' '}
-                              {m.rewards > 0 ? ` · ${m.rewards} cadeau(x)` : ''}
+                              <bdi>{m.phone}</bdi>
+                            </small>
+                            <small>
+                              {m.stamps}/{m.goal} {t('tampons')}{' '}
+                              {m.rewards > 0 ? t(' · {0} cadeau(x)', m.rewards) : ''}
                             </small>
                           </span>
                           <ArrowRight size={17} />
                         </button>
                       ))}
                       {!members.length && (
-                        <p>{searching ? 'Recherche…' : 'Aucun client trouvé.'}</p>
+                        <p>{searching ? t('Recherche…') : t('Aucun client trouvé.')}</p>
                       )}
                     </div>
                     <div className="loy-pagination">
@@ -702,15 +742,17 @@ export default function LoyaltyAdmin() {
                         disabled={offset === 0 || searching}
                         onClick={() => setOffset((o) => Math.max(0, o - 20))}
                       >
-                        Précédents
+                        {t('Précédents')}{' '}
                       </button>
-                      <span>Page {offset / 20 + 1}</span>
+                      <span>
+                        {t('Page')} {offset / 20 + 1}
+                      </span>
                       <button
                         className="loy-link"
                         disabled={members.length < 20 || searching}
                         onClick={() => setOffset((o) => o + 20)}
                       >
-                        Suivants
+                        {t('Suivants')}{' '}
                       </button>
                     </div>
                   </section>
@@ -721,18 +763,22 @@ export default function LoyaltyAdmin() {
       )}
       {modal === 'recover' && selected && (
         <Modal
-          title={recoveryLink ? 'Sa carte est retrouvée.' : 'Redonner accès à sa carte.'}
+          title={recoveryLink ? t('Sa carte est retrouvée.') : t('Redonner accès à sa carte.')}
           onClose={() => setModal(null)}
         >
           {recoveryLink ? (
             <>
               <p>
-                Le solde et les cadeaux sont conservés. L’ancien lien ne fonctionne plus. Demandez
-                au client de scanner ce QR et d’enregistrer sa nouvelle carte.
+                {t(
+                  'Le solde et les cadeaux sont conservés. L’ancien lien ne fonctionne plus. Demandez au client de scanner ce QR et d’enregistrer sa nouvelle carte.',
+                )}{' '}
               </p>
-              <QR value={recoveryLink} label="Nouveau lien privé à remettre uniquement au client" />
+              <QR
+                value={recoveryLink}
+                label={t('Nouveau lien privé à remettre uniquement au client')}
+              />
               <a className="loy-link" href={recoveryLink} target="_blank" rel="noreferrer">
-                Ouvrir son nouveau lien
+                {t('Ouvrir son nouveau lien')}{' '}
               </a>
               <button
                 className="loy-secondary"
@@ -745,7 +791,7 @@ export default function LoyaltyAdmin() {
                   }
                 }}
               >
-                Copier son lien privé
+                {t('Copier son lien privé')}{' '}
               </button>
             </>
           ) : (
@@ -774,11 +820,13 @@ export default function LoyaltyAdmin() {
               }}
             >
               <p>
-                Pour <strong>{selected.name}</strong>. Faites dire son numéro au client, sans le lui
-                souffler, pour distinguer les homonymes.
+                {t('Pour')} <strong>{selected.name}</strong>
+                {t(
+                  '. Faites dire son numéro au client, sans le lui souffler, pour distinguer les homonymes.',
+                )}{' '}
               </p>
               <label>
-                Les 4 derniers chiffres de son téléphone
+                {t('Les 4 derniers chiffres de son téléphone')}{' '}
                 <input
                   name="last4"
                   inputMode="numeric"
@@ -791,29 +839,33 @@ export default function LoyaltyAdmin() {
               </label>
               <label className="loy-checkbox">
                 <input type="checkbox" name="verified" required />
-                <span>Le client est présent et j’ai vérifié son identité et son numéro.</span>
+                <span>
+                  {t('Le client est présent et j’ai vérifié son identité et son numéro.')}
+                </span>
               </label>
               <p className="loy-field-help">
-                L’ancien lien personnel sera désactivé. Les tampons, les cadeaux et le code de
-                caisse sont conservés.
+                {t(
+                  'L’ancien lien personnel sera désactivé. Les tampons, les cadeaux et le code de caisse sont conservés.',
+                )}{' '}
               </p>
               <button className="loy-button" disabled={busy}>
-                Créer son nouveau lien
+                {t('Créer son nouveau lien')}{' '}
               </button>
             </form>
           )}
           {error && (
             <p className="loy-alert" role="alert">
-              {error}
+              {t(error)}
             </p>
           )}
         </Modal>
       )}
       {modal === 'erase' && selected && (
-        <Modal title="Supprimer définitivement sa carte ?" onClose={() => setModal(null)}>
+        <Modal title={t('Supprimer définitivement sa carte ?')} onClose={() => setModal(null)}>
           <p>
-            À la demande du client, cette action efface son nom, son téléphone, ses tampons, ses
-            cadeaux et son historique. Elle ne peut pas être annulée.
+            {t(
+              'À la demande du client, cette action efface son nom, son téléphone, ses tampons, ses cadeaux et son historique. Elle ne peut pas être annulée.',
+            )}{' '}
           </p>
           <form
             onSubmit={async (e) => {
@@ -834,20 +886,28 @@ export default function LoyaltyAdmin() {
             }}
           >
             <label>
-              Recopiez {selected.code} pour confirmer
+              {t('Recopiez')} {selected.code} {t('pour confirmer')}{' '}
               <input name="confirm" required pattern={selected.code} autoComplete="off" />
             </label>
             <button className="loy-danger" disabled={busy}>
-              Effacer définitivement
+              {t('Effacer définitivement')}{' '}
             </button>
           </form>
           {error && (
             <p className="loy-alert" role="alert">
-              {error}
+              {t(error)}
             </p>
           )}
         </Modal>
       )}
     </div>
+  );
+}
+
+export default function LoyaltyAdmin() {
+  return (
+    <LoyaltyLanguageProvider>
+      <LoyaltyAdminContent />
+    </LoyaltyLanguageProvider>
   );
 }

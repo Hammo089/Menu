@@ -58,6 +58,20 @@ async function setup(page: Page, authenticated = false) {
       { owner },
     );
   await page.route('**/api/loyalty-session', (r) => r.fulfill({ json: { ok: true } }));
+  await page.route('**/rest/v1/rpc/loyalty_login', async (route) => {
+    const { payload } = route.request().postDataJSON();
+    calls.push({ action: 'login', payload });
+    if (payload.name !== 'Camille Martin' || payload.phone !== '0611223344')
+      return route.fulfill({
+        json: {
+          error:
+            'Nom ou téléphone incorrect. Utilisez exactement le nom enregistré, ou demandez de l’aide au comptoir.',
+        },
+      });
+    key = payload.key;
+    const { phone, ...publicMember } = member;
+    await route.fulfill({ json: { member: publicMember, program } });
+  });
   await page.route('**/rest/v1/rpc/loyalty_api', async (route) => {
     const body = route.request().postDataJSON();
     calls.push(body);
@@ -194,6 +208,55 @@ test('public customer code opens the staff login, never a customer private card'
   await page.goto(`/admin/fidelite?carte=${code}`);
   await expect(page.getByRole('heading', { name: 'Bonjour, l’équipe.' })).toBeVisible();
   await expect(page.getByText('Camille Martin', { exact: true })).toHaveCount(0);
+});
+
+test('customers reopen an existing card by name and phone after signing out', async ({ page }) => {
+  const calls = await setup(page);
+  await page.goto('/fidelite?connexion=1');
+  await page.getByLabel('Votre nom et prénom').fill('Wrong name');
+  await page.getByLabel('Votre téléphone', { exact: true }).fill('0611223344');
+  await page.getByRole('button', { name: 'Retrouver ma carte', exact: true }).click();
+  await expect(page.getByRole('alert')).toContainText('Nom ou téléphone incorrect');
+  await page.getByLabel('Votre nom et prénom').fill('Camille Martin');
+  await page.getByRole('button', { name: 'Retrouver ma carte', exact: true }).click();
+  await expect(page.getByLabel('3 tampons sur 8')).toBeVisible();
+  await page.getByRole('button', { name: 'Me déconnecter de cet appareil', exact: true }).click();
+  await page.getByRole('button', { name: 'Me déconnecter', exact: true }).click();
+  await expect(page.getByRole('heading', { name: 'Heureux de vous revoir.' })).toBeVisible();
+  await page.getByLabel('Votre nom et prénom').fill('Camille Martin');
+  await page.getByLabel('Votre téléphone', { exact: true }).fill('0611223344');
+  await page.getByRole('button', { name: 'Retrouver ma carte', exact: true }).click();
+  await expect(page.getByLabel('3 tampons sur 8')).toBeVisible();
+  expect(calls.filter((c) => c.action === 'register')).toHaveLength(0);
+});
+
+test('loyalty administration switches completely to Arabic with RTL and remembers the selection', async ({
+  page,
+}) => {
+  await setup(page, true);
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/admin/fidelite');
+  await page.getByRole('button', { name: 'عربي', exact: true }).click();
+  await expect(page.getByRole('heading', { name: 'كل زيارة إلها قيمة.' })).toBeVisible();
+  await expect(page.locator('html')).toHaveAttribute('dir', 'rtl');
+  await page.getByRole('button', { name: 'إعدادات البرنامج', exact: true }).click();
+  await page.getByLabel('عدد المشروبات للحصول على هدية').fill('10');
+  await page.getByRole('button', { name: 'حفظ إعدادات البرنامج' }).click();
+  await expect(page.getByText('تم حفظ شروط البرنامج.')).toBeVisible();
+  await page.reload();
+  await expect(page.getByRole('heading', { name: 'كل زيارة إلها قيمة.' })).toBeVisible();
+  await page.getByLabel('أو أدخل كود البطاقة').fill(code);
+  await page.getByRole('button', { name: 'فتح البطاقة', exact: true }).click();
+  await page.getByLabel('عدد المشروبات المدفوعة').fill('1');
+  await page.getByRole('checkbox').check();
+  await page.getByRole('button', { name: 'إضافة 1 أختام' }).click();
+  await expect(page.getByLabel('4 أختام من 8')).toBeVisible();
+  await expect(page.getByText('تمت إضافة الأختام. تتحدث بطاقة الزبون تلقائيًا.')).toBeVisible();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  await page.screenshot({ path: '/tmp/blanco-loyalty-admin-ar.png', fullPage: true });
+  await page.getByRole('button', { name: 'FR', exact: true }).click();
+  await expect(page.getByLabel('Nombre de boissons payées')).toBeVisible();
+  await expect(page.locator('html')).toHaveAttribute('dir', 'ltr');
 });
 
 test('opening a replacement private link in an existing tab switches to the new card', async ({

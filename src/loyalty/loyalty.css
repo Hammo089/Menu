@@ -1213,3 +1213,87 @@
     display: none;
   }
 }
+
+.loy-language-switch,
+.loy-entry-tabs {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  border: 1px solid var(--loy-line);
+  border-radius: 10px;
+  background: #eeefe5;
+}
+.loy-language-switch button,
+.loy-entry-tabs button {
+  border: 0;
+  border-radius: 7px;
+  padding: 8px 12px;
+  background: transparent;
+  color: var(--loy-green);
+  font-size: 12px;
+}
+.loy-language-switch button.active,
+.loy-entry-tabs button.active {
+  background: var(--loy-green);
+  color: white;
+}
+.loy-entry-tabs {
+  margin-bottom: 25px;
+}
+.loy-entry-tabs button {
+  flex: 1;
+}
+.loy-admin[dir='rtl'] h1,
+.loy-admin[dir='rtl'] h2,
+.loy-admin[dir='rtl'] .loy-wordmark {
+  letter-spacing: 0;
+}
+.loy-admin[dir='rtl'] .loy-eyebrow {
+  letter-spacing: 0.3px;
+}
+.loy-admin[dir='rtl'] .loy-client-list > button,
+.loy-admin[dir='rtl'] .loy-save-button {
+  text-align: right;
+}
+.loy-admin[dir='rtl'] .loy-search {
+  padding-left: 0;
+  padding-right: 13px;
+}
+.loy-admin[dir='rtl'] .lucide-arrow-left,
+.loy-admin[dir='rtl'] .lucide-arrow-right {
+  transform: scaleX(-1);
+}
+.loy-admin[dir='rtl'] .loy-stamp-card h2 > span {
+  font-family: Arial, sans-serif;
+}
+.loy-admin[dir='rtl'] .loy-wordmark {
+  font-family: Georgia, serif;
+  letter-spacing: -2px;
+}
+.loy-admin input[type='email'],
+.loy-admin input[type='password'],
+.loy-admin input[type='tel'],
+.loy-admin .loy-inline-form input[name='confirm'],
+.loy-big-code,
+.loy-code strong {
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+.loy-admin[dir='rtl'] .loy-modal > .loy-icon-button {
+  right: auto;
+  left: 14px;
+}
+.loy-admin[dir='rtl'] .loy-modal h2 {
+  padding-right: 0;
+  padding-left: 20px;
+}
+@media print {
+  .loy-language-switch {
+    display: none;
+  }
+}
+.loy-card-bottom strong {
+  display: inline-block;
+  direction: ltr;
+  unicode-bidi: isolate;
+}
