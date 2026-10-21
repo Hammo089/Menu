@@ -25,6 +25,7 @@ import {
   X,
 } from 'lucide-react';
 import { useMenu } from './store';
+import TVLoyaltyControls from './TVLoyaltyControls';
 import HolidayControls from './HolidayControls';
 import TVAtmosphere from './HolidayEffect';
 import { formatPrice, initialMenu, safeImage, supabase, validateMenu } from './lib';
@@ -982,6 +983,7 @@ export default function Admin() {
           )}
           {tab === 'television' && (
             <div className="settings-grid">
+              <TVLoyaltyControls settings={draft.settings} onChange={changeSettings} lang={lang} />
               <article className="admin-panel form-panel">
                 <h3>{l('التلفزيون، بالشكل المناسب', 'Votre TV, dans le bon sens')}</h3>
                 <label>

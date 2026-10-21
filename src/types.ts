@@ -1,3 +1,4 @@
+import type { TVLoyaltySettings } from './tvLoyalty';
 import type { HolidaySettings } from './holidays';
 export type Product = {
   id: string;
@@ -19,6 +20,7 @@ export type Settings = HolidaySettings & {
   logo: string;
   tvBackground: string;
   tvScale: number;
+  tvLoyalty?: TVLoyaltySettings;
   tvOrientation: 'portrait' | 'landscape';
   tvRotation: 0 | 90 | 180 | 270;
   season: Season;

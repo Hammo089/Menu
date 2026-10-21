@@ -4,6 +4,8 @@ import originalSvg from './data/original-menu.svg?raw';
 import { initialMenu, originalPrice } from './lib';
 import { useMenu } from './store';
 import { Promotion } from './components';
+import { TVLoyalty } from './TVLoyalty';
+import { tvLoyaltySettings } from './tvLoyalty';
 import TVAtmosphere from './HolidayEffect';
 import type { MenuState, Settings } from './types';
 
@@ -105,44 +107,6 @@ export function tvTextLayer(svg: string) {
   prune(document.documentElement);
   return new XMLSerializer().serializeToString(document.documentElement);
 }
-function TVLoyalty() {
-  const [qr, setQr] = useState('');
-  const url = new URL('/fidelite', window.location.origin).href;
-  useEffect(() => {
-    let active = true;
-    import('qrcode')
-      .then((q) =>
-        q.toDataURL(url, {
-          width: 600,
-          margin: 4,
-          errorCorrectionLevel: 'M',
-          color: { dark: '#23211f', light: '#ffffff' },
-        }),
-      )
-      .then((value) => {
-        if (active) setQr(value);
-      })
-      .catch(() => {});
-    return () => {
-      active = false;
-    };
-  }, [url]);
-  return (
-    <a className="tv-loyalty" href={url} aria-label="S’inscrire à la carte de fidélité Blanco">
-      {qr ? (
-        <img src={qr} alt="QR d’inscription à la carte de fidélité Blanco" />
-      ) : (
-        <span className="tv-qr-placeholder" />
-      )}
-      <div>
-        <span className="tv-loyalty-eyebrow">LE CLUB BLANCO</span>
-        <strong>Votre fidélité récompensée.</strong>
-        <p>Scannez ici pour créer votre carte de fidélité.</p>
-        <small>Cumulez des tampons · Profitez de cadeaux</small>
-      </div>
-    </a>
-  );
-}
 export default function TVMenu() {
   const { menu } = useMenu();
   const container = useRef<HTMLDivElement>(null);
@@ -168,6 +132,7 @@ export default function TVMenu() {
       }
     },
   );
+  const loyalty = tvLoyaltySettings(menu.settings.tvLoyalty);
   const orientation = device.tvOrientation || menu.settings.tvOrientation;
   const rotation = device.tvRotation ?? menu.settings.tvRotation;
   const ratio = orientation === 'portrait' ? 9 / 16 : 16 / 9;
@@ -252,9 +217,17 @@ export default function TVMenu() {
     >
       <div
         className={`tv-stage ${orientation}`}
+        data-loyalty-position={loyalty.position}
         data-orientation={orientation}
         data-rotation={rotation}
-        style={{ width, height, transform: `translate(-50%,-50%) rotate(${rotation}deg)` }}
+        style={
+          {
+            '--tv-loyalty-space': `${loyalty.enabled ? loyalty.height : 0}%`,
+            width,
+            height,
+            transform: `translate(-50%,-50%) rotate(${rotation}deg)`,
+          } as CSSProperties
+        }
       >
         <div
           className="tv-artwork"
@@ -269,7 +242,7 @@ export default function TVMenu() {
           style={{ transform: `scale(${menu.settings.tvScale})` }}
           dangerouslySetInnerHTML={{ __html: textSvg }}
         />
-        <TVLoyalty />
+        <TVLoyalty settings={loyalty} />
         <Promotion products={menu.products} settings={menu.settings} />
       </div>
       <div

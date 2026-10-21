@@ -3208,3 +3208,84 @@ html {
   font-size: 1cqh;
   color: #615b50;
 }
+
+.tv-stage > .tv-artwork {
+  bottom: var(--tv-loyalty-space, 12%);
+  height: calc(100% - var(--tv-loyalty-space, 12%));
+}
+.tv-stage[data-loyalty-position='top'] > .tv-artwork {
+  top: var(--tv-loyalty-space, 12%);
+  bottom: 0;
+}
+.tv-loyalty {
+  height: calc(var(--tv-loyalty-space, 12%) - 2%);
+  gap: 2cqw;
+}
+.tv-stage[data-loyalty-position='top'] > .tv-loyalty {
+  top: 1%;
+  bottom: auto;
+}
+.tv-loyalty[data-qr-side='right'] {
+  flex-direction: row-reverse;
+}
+.tv-loyalty img,
+.tv-qr-placeholder {
+  width: calc(min(13cqw, 8cqh) * var(--qr-scale, 1));
+  height: calc(min(13cqw, 8cqh) * var(--qr-scale, 1));
+  max-height: 100%;
+  object-fit: contain;
+}
+.tv-loyalty > div {
+  min-width: 0;
+}
+.tv-loyalty strong {
+  font-size: calc(1.75cqh * var(--text-scale, 1));
+  overflow-wrap: anywhere;
+}
+.tv-loyalty p {
+  font-size: calc(1.25cqh * var(--text-scale, 1));
+  overflow-wrap: anywhere;
+}
+.tv-loyalty-eyebrow,
+.tv-loyalty small {
+  font-size: calc(1cqh * var(--text-scale, 1));
+  overflow-wrap: anywhere;
+}
+.tv-loyalty small {
+  color: inherit;
+  opacity: 0.8;
+}
+.tv-loyalty :is(p, strong, small, span):empty {
+  display: none;
+}
+.tv-loyalty-preview {
+  position: relative;
+  container-type: size;
+  height: 200px;
+  background: #fafafa;
+  border-radius: 12px;
+  overflow: hidden;
+}
+.tv-loyalty-preview .tv-loyalty {
+  inset: 12px;
+  width: auto;
+  height: auto;
+}
+.tv-loyalty-preview .tv-loyalty strong {
+  font-size: calc(18px * var(--text-scale, 1));
+}
+.tv-loyalty-preview .tv-loyalty p {
+  font-size: calc(13px * var(--text-scale, 1));
+}
+.tv-loyalty-preview .tv-loyalty-eyebrow,
+.tv-loyalty-preview .tv-loyalty small {
+  font-size: calc(11px * var(--text-scale, 1));
+}
+.tv-loyalty-preview .tv-loyalty img {
+  width: calc(90px * var(--qr-scale, 1));
+  height: calc(90px * var(--qr-scale, 1));
+}
+
+.tv-loyalty {
+  overflow: hidden;
+}

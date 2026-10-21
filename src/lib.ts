@@ -1,6 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 import rawMenu from './data/menu.json';
 import type { MenuState } from './types';
+import { validTVLoyalty } from './tvLoyalty';
 import { validHolidaySettings } from './holidays';
 
 export const initialMenu = rawMenu as MenuState;
@@ -73,6 +74,7 @@ export function validateMenu(value: unknown): value is MenuState {
         m.settings.season,
       ) &&
       validHolidaySettings(m.settings) &&
+      validTVLoyalty(m.settings.tvLoyalty) &&
       typeof m.settings.adsEnabled === 'boolean' &&
       Number.isFinite(m.settings.tvScale) &&
       m.settings.tvScale >= 0.5 &&
