@@ -407,9 +407,9 @@ export default function CustomerLoyalty() {
             Si vous perdez votre carte, votre lien personnel ou ne parvenez plus à accéder à votre
             compte, contactez la direction de Blanco au comptoir. Après vérification de votre nom et
             de votre numéro de téléphone au comptoir, la direction vous remettra un lien sécurisé,
-            valable 30 minutes et utilisable une seule fois, pour choisir un nouveau PIN et
-            retrouver le même compte, avec vos tampons et vos cadeaux encore valables. Il n’est pas
-            nécessaire de créer un nouveau compte.
+            sans limite de temps et utilisable une seule fois (tout nouveau lien annule le
+            précédent), pour choisir un nouveau PIN et retrouver le même compte, avec vos tampons et
+            vos cadeaux encore valables. Il n’est pas nécessaire de créer un nouveau compte.
           </p>
           <p>
             Vos données et votre historique sont conservés tant que votre carte existe. Demandez au

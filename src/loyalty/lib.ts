@@ -47,7 +47,7 @@ export interface Result {
   setupName?: string;
   approvalCode?: string;
   approvalExpiresAt?: string;
-  recoveryExpiresAt?: string;
+  recoveryExpiresAt?: string | null;
   member: Member;
   program: Program;
   owner: boolean;

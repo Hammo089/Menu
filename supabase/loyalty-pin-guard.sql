@@ -38,8 +38,8 @@ begin
     if action='activate' then
       if pin_text !~ '^[0-9]{6}$' or pin_text ~ '^([0-9])\1{5}$' or pin_text in ('123456','654321') or coalesce(payload->>'deviceKey','') !~ '^[a-f0-9]{64}$' or payload->>'deviceKey'=payload->>'key' then return jsonb_build_object('error','Choisissez un PIN personnel de 6 chiffres, sans suite évidente.'); end if;
       select lm.* into m from blanco_private.loyalty_members lm join blanco_private.loyalty_auth la on la.member_id=lm.id
-        where la.recovery_hash=key_hash and la.recovery_expires_at>now() for update of lm;
-      if not found then return jsonb_build_object('error','Ce lien de réinitialisation est expiré ou déjà utilisé. Connectez-vous avec votre PIN ou demandez un nouveau lien à la direction.'); end if;
+        where la.recovery_hash=key_hash and (la.recovery_expires_at is null or la.recovery_expires_at>now()) for update of lm,la;
+      if not found then return jsonb_build_object('error','Ce lien de réinitialisation a déjà été utilisé ou remplacé. Connectez-vous avec votre PIN ou demandez un nouveau lien à la direction.'); end if;
       update blanco_private.loyalty_auth set pin_hash=extensions.crypt(pin_text,extensions.gen_salt('bf',12)),recovery_hash=null,recovery_expires_at=null where member_id=m.id returning * into a;
       key_hash:=encode(sha256(convert_to(payload->>'deviceKey','UTF8')),'hex');
       insert into blanco_private.loyalty_device_keys(token_hash,member_id,auth_version) values(key_hash,m.id,a.version);
@@ -51,7 +51,7 @@ begin
     if not found then
       if action='card' then
         select lm.* into m from blanco_private.loyalty_members lm join blanco_private.loyalty_auth la on la.member_id=lm.id
-          where la.recovery_hash=key_hash and la.recovery_expires_at>now();
+          where la.recovery_hash=key_hash and (la.recovery_expires_at is null or la.recovery_expires_at>now());
         if found then return jsonb_build_object('setupRequired',true,'setupName',m.name,'program',cfg); end if;
       end if;
       return jsonb_build_object('error','Cette carte est introuvable. Connectez-vous avec votre téléphone et votre PIN, ou contactez la direction.');
@@ -114,11 +114,11 @@ begin
   if action='recover' then
     select * into m from blanco_private.loyalty_members where id=(response->'member'->>'id')::uuid;
     insert into blanco_private.loyalty_auth(member_id,version,recovery_hash,recovery_expires_at)
-      values(m.id,1,encode(sha256(convert_to(payload->>'key','UTF8')),'hex'),now()+interval '30 minutes')
+      values(m.id,1,encode(sha256(convert_to(payload->>'key','UTF8')),'hex'),null)
       on conflict(member_id) do update set version=loyalty_auth.version+1,pin_hash=null,recovery_hash=excluded.recovery_hash,recovery_expires_at=excluded.recovery_expires_at;
     delete from blanco_private.loyalty_device_keys where member_id=m.id;
     delete from blanco_private.loyalty_reward_approvals where reward_id in(select id from blanco_private.loyalty_rewards where member_id=m.id);
-    return response||jsonb_build_object('recoveryExpiresAt',now()+interval '30 minutes');
+    return response||jsonb_build_object('recoveryExpiresAt',null);
   end if;
   return response;
 end $$;

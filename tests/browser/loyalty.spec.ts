@@ -369,7 +369,7 @@ test('recovery provides a visible follow-up link, one-time PIN setup and a separ
   await page.getByLabel('Confirmez votre PIN', { exact: true }).fill('736194');
   await page.getByRole('button', { name: 'Enregistrer mon PIN et ouvrir ma carte' }).click();
   await expect(page.getByLabel('3 tampons sur 8')).toBeVisible();
-  expect(page.url()).not.toBe(link);
+  await expect(page).not.toHaveURL(link);
   await page.getByRole('button', { name: 'Préparer mon cadeau' }).click();
   await page.getByLabel('Votre PIN (6 chiffres)', { exact: true }).fill('736194');
   await page.getByRole('button', { name: 'Obtenir mon code cadeau' }).click();

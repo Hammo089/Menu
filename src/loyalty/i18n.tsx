@@ -238,8 +238,8 @@ Object.assign(arabic, {
   'Ce lien ouvre le suivi client : tampons, boissons comptabilisées et cadeaux. Le client choisit d’abord son nouveau PIN.':
     'هذا الرابط بيفتح متابعة الزبون: الأختام والمشروبات المحتسبة والهدايا. الزبون بيختار أولًا PIN جديد إله.',
   'Lien personnel de suivi du client': 'رابط متابعة حساب الزبون الخاص',
-  'Lien valable 30 minutes, à usage unique. Les anciens accès et l’ancien PIN sont désactivés. Le QR ci-dessous ouvre exactement ce même lien.':
-    'الرابط صالح ٣٠ دقيقة ولمرة واحدة. تم إيقاف المداخل السابقة والـPIN القديم. رمز QR بالأسفل بيفتح نفس الرابط تمامًا.',
+  'Lien sans limite de temps, à usage unique. Un nouveau lien annule le précédent. Les anciens accès et l’ancien PIN sont désactivés. Le QR ci-dessous ouvre exactement ce même lien.':
+    'الرابط بدون مهلة زمنية ولمرة واحدة. إصدار رابط جديد يلغي السابق. تم إيقاف المداخل السابقة والـPIN القديم. رمز QR بالأسفل بيفتح نفس الرابط تمامًا.',
   'Copie impossible. Sélectionnez et copiez le lien ci-dessus.':
     'تعذّر النسخ. حدّد الرابط بالأعلى وانسخه.',
   'Demandez au client son code cadeau temporaire. Le QR seul ne permet pas d’utiliser un cadeau.':

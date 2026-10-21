@@ -847,7 +847,7 @@ function LoyaltyAdminContent() {
               )}
               <p className="loy-field-help">
                 {t(
-                  'Lien valable 30 minutes, à usage unique. Les anciens accès et l’ancien PIN sont désactivés. Le QR ci-dessous ouvre exactement ce même lien.',
+                  'Lien sans limite de temps, à usage unique. Un nouveau lien annule le précédent. Les anciens accès et l’ancien PIN sont désactivés. Le QR ci-dessous ouvre exactement ce même lien.',
                 )}
               </p>
               <QR

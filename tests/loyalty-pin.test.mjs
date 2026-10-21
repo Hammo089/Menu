@@ -175,7 +175,32 @@ test('PIN migration revokes weak access, hashes secrets, protects recovery and r
     /réservé/,
   );
   await role(owner);
+  const replacedReset = '1'.repeat(64);
+  result = await rpc('recover', { code, key: replacedReset, last4: '4455', verified: true });
+  assert.equal(result.recoveryExpiresAt, null, 'recovery links have no deadline');
   await rpc('recover', { code, key: reset, last4: '4455', verified: true });
+  await role();
+  assert.ok(
+    (await rpc('card', { key: replacedReset })).error,
+    'issuing a link revokes the previous one',
+  );
+  await db.exec('reset role');
+  // Upgrade a previously issued link whose old thirty-minute deadline has passed.
+  await db.query(
+    "update blanco_private.loyalty_auth set recovery_expires_at=now()-interval '30 days' where member_id=(select id from blanco_private.loyalty_members where code=$1)",
+    [code],
+  );
+  await db.exec(
+    readFileSync(new URL('../supabase/loyalty-recovery-once.sql', import.meta.url), 'utf8'),
+  );
+  assert.equal(
+    (
+      await db.query(
+        'select recovery_expires_at from blanco_private.loyalty_auth where recovery_hash is not null',
+      )
+    ).rows[0].recovery_expires_at,
+    null,
+  );
   await role();
   assert.ok((await rpc('card', { key })).error);
   assert.ok((await rpc('card', { key: newDevice })).error);
