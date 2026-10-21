@@ -92,6 +92,57 @@ export function renderTvSvg(menu: MenuState) {
   }
   return new XMLSerializer().serializeToString(document.documentElement);
 }
+// Keep the original artwork below the atmosphere, with all live text above it.
+export function tvTextLayer(svg: string) {
+  const document = new DOMParser().parseFromString(svg, 'image/svg+xml');
+  const prune = (node: Element) => {
+    for (const child of [...node.children]) {
+      if (['defs', 'text', 'style', 'image'].includes(child.localName)) continue;
+      if (['g', 'svg', 'a'].includes(child.localName)) prune(child);
+      else child.remove();
+    }
+  };
+  prune(document.documentElement);
+  return new XMLSerializer().serializeToString(document.documentElement);
+}
+function TVLoyalty() {
+  const [qr, setQr] = useState('');
+  const url = new URL('/fidelite', window.location.origin).href;
+  useEffect(() => {
+    let active = true;
+    import('qrcode')
+      .then((q) =>
+        q.toDataURL(url, {
+          width: 600,
+          margin: 4,
+          errorCorrectionLevel: 'M',
+          color: { dark: '#23211f', light: '#ffffff' },
+        }),
+      )
+      .then((value) => {
+        if (active) setQr(value);
+      })
+      .catch(() => {});
+    return () => {
+      active = false;
+    };
+  }, [url]);
+  return (
+    <a className="tv-loyalty" href={url} aria-label="S’inscrire à la carte de fidélité Blanco">
+      {qr ? (
+        <img src={qr} alt="QR d’inscription à la carte de fidélité Blanco" />
+      ) : (
+        <span className="tv-qr-placeholder" />
+      )}
+      <div>
+        <span className="tv-loyalty-eyebrow">LE CLUB BLANCO</span>
+        <strong>Votre fidélité récompensée.</strong>
+        <p>Scannez ici pour créer votre carte de fidélité.</p>
+        <small>Cumulez des tampons · Profitez de cadeaux</small>
+      </div>
+    </a>
+  );
+}
 export default function TVMenu() {
   const { menu } = useMenu();
   const container = useRef<HTMLDivElement>(null);
@@ -145,6 +196,12 @@ export default function TVMenu() {
     return () => clearTimeout(timeout);
   }, [controls, panel]);
   const svg = useMemo(() => renderTvSvg(menu), [menu]);
+  const textSvg = useMemo(() => tvTextLayer(svg), [svg]);
+  const backgroundSvg = useMemo(() => {
+    const document = new DOMParser().parseFromString(svg, 'image/svg+xml');
+    document.querySelectorAll('text').forEach((node) => node.remove());
+    return new XMLSerializer().serializeToString(document.documentElement);
+  }, [svg]);
   useEffect(() => {
     document.documentElement.classList.add('tv-document');
     const change = () => setFullscreen(!!document.fullscreenElement);
@@ -202,9 +259,17 @@ export default function TVMenu() {
         <div
           className="tv-artwork"
           style={{ transform: `scale(${menu.settings.tvScale})` }}
-          dangerouslySetInnerHTML={{ __html: svg }}
+          dangerouslySetInnerHTML={{ __html: backgroundSvg }}
         />
-        <TVAtmosphere settings={menu.settings} />
+        <div className="tv-atmosphere">
+          <TVAtmosphere settings={menu.settings} />
+        </div>
+        <div
+          className="tv-artwork tv-text-layer"
+          style={{ transform: `scale(${menu.settings.tvScale})` }}
+          dangerouslySetInnerHTML={{ __html: textSvg }}
+        />
+        <TVLoyalty />
         <Promotion products={menu.products} settings={menu.settings} />
       </div>
       <div

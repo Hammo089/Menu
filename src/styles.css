@@ -3135,3 +3135,76 @@ html {
 .photo-bat {
   clip-path: inset(12% 0 0 0);
 }
+
+/* TV layers: artwork → atmosphere → readable menu text → loyalty → promotions. */
+.tv-stage {
+  container-type: size;
+}
+.tv-stage > .tv-artwork {
+  position: absolute;
+  inset: 0 0 12%;
+  height: 88%;
+  z-index: 0;
+}
+.tv-stage > .tv-atmosphere {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+.tv-stage > .tv-text-layer {
+  z-index: 2;
+  pointer-events: none;
+}
+.tv-text-layer text {
+  paint-order: stroke fill;
+  stroke: #fcfcfc;
+  stroke-width: 1.4px;
+  stroke-linejoin: round;
+}
+.tv-loyalty {
+  position: absolute;
+  z-index: 3;
+  bottom: 1.2%;
+  left: 5%;
+  width: 90%;
+  height: 10%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2.5cqw;
+  color: #292723;
+  text-decoration: none;
+  background: #f4f0e8;
+  border: 1px solid #cfc6b7;
+  border-radius: 1.4cqw;
+  padding: 1cqh 2cqw;
+}
+.tv-loyalty img,
+.tv-qr-placeholder {
+  width: min(13cqw, 8cqh);
+  height: min(13cqw, 8cqh);
+  flex-shrink: 0;
+  border-radius: 0.5cqw;
+}
+.tv-loyalty-eyebrow {
+  display: block;
+  font-size: 1cqh;
+  letter-spacing: 0.18em;
+  margin-bottom: 0.4cqh;
+}
+.tv-loyalty strong {
+  display: block;
+  font-family: Georgia, serif;
+  font-size: 1.75cqh;
+  font-weight: 500;
+}
+.tv-loyalty p {
+  font-size: 1.25cqh;
+  margin: 0.45cqh 0;
+}
+.tv-loyalty small {
+  display: block;
+  font-size: 1cqh;
+  color: #615b50;
+}

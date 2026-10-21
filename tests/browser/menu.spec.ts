@@ -171,3 +171,49 @@ test('advertisement starts after its interval, disappears after five seconds, an
   await page.clock.fastForward(55000);
   await expect(page.locator('#ad-timing-fixture .promotion-card h2')).toHaveText('Ristretto');
 });
+
+test('TV loyalty QR opens public registration and atmosphere stays behind every menu label', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1080, height: 1920 });
+  await page.goto('/tv');
+  const qr = page.getByRole('img', { name: 'QR d’inscription à la carte de fidélité Blanco' });
+  await expect(qr).toBeVisible();
+  await expect(page.locator('.tv-loyalty')).toHaveAttribute(
+    'href',
+    'http://127.0.0.1:5173/fidelite',
+  );
+  const decoded = await qr.evaluate(async (image: HTMLImageElement) => {
+    const { BrowserQRCodeReader } = await import(
+      /* @vite-ignore */ '/node_modules/.vite/deps/@zxing_browser.js'
+    );
+    return (await new BrowserQRCodeReader().decodeFromImageElement(image)).getText();
+  });
+  expect(decoded).toBe('http://127.0.0.1:5173/fidelite');
+  for (const orientation of ['portrait', 'landscape']) {
+    if (orientation === 'landscape') {
+      await page.setViewportSize({ width: 1920, height: 1080 });
+      await page
+        .getByRole('button', { name: 'إعدادات الشاشة / Réglages de l’écran', exact: true })
+        .click();
+      await page.getByLabel('اتجاه الشاشة / Orientation').selectOption('landscape');
+      await page.getByRole('button', { name: 'تم / Terminé' }).click();
+    }
+    expect(
+      await page.evaluate(() => {
+        const text = document.querySelector('.tv-text-layer')!;
+        const effects = document.querySelector('.tv-atmosphere')!;
+        const footer = document.querySelector('.tv-loyalty')!.getBoundingClientRect();
+        const labels = [...text.querySelectorAll('text')].map((node) =>
+          node.getBoundingClientRect(),
+        );
+        return (
+          Number(getComputedStyle(text).zIndex) > Number(getComputedStyle(effects).zIndex) &&
+          labels.every((rect) => rect.bottom < footer.top) &&
+          document.querySelectorAll('.tv-artwork:not(.tv-text-layer) text').length === 0
+        );
+      }),
+    ).toBe(true);
+    await page.screenshot({ path: `/tmp/blanco-tv-loyalty-${orientation}.png` });
+  }
+});
