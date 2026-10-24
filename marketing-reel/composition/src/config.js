@@ -1,0 +1,1 @@
+window.CFG={DURATION_SEC:25,FPS:60,BPM:120,W:1080,H:1920,seed:241024,colors:{paper:'#f7f6f2',mint:'#afd5b6',ink:'#1c211e',espresso:'#241c17',gold:'#edc88d'},beats:{coffee:0,matcha:10,desserts:20,together:30,outro:40,end:50}};

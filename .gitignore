@@ -17,3 +17,13 @@ brag-output/render.log
 brag-output/composition/.preview/
 brag-output/work-*/
 brag-output/brag.poster.mp4
+
+# Marketing reel local renders and preview state
+marketing-reel/composition/.hyperframes/
+marketing-reel/work-*/
+marketing-reel/render.log
+marketing-reel/*.poster.mp4
+marketing-reel/composition/node_modules/
+marketing-reel/check.log
+marketing-reel/snapshot.log
+marketing-reel/peaks.log

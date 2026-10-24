@@ -1,0 +1,1 @@
+{"assertions":[{"kind":"appearsBy","selector":"#coffee-title","bySec":0.1},{"kind":"appearsBy","selector":"#matcha-title","bySec":5.9},{"kind":"appearsBy","selector":"#sweets-title","bySec":10.9},{"kind":"appearsBy","selector":"#outro-action","bySec":21.3},{"kind":"staysInFrame","selector":"#outro-title"}]}

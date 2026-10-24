@@ -82,3 +82,5 @@ npm run render -- --quality delivery --output ../brag.mp4
 
 Node 22+, Chromium and FFmpeg are required. The video CLI is pinned to 0.8.192.
 The MP4 includes a music credit; preserve the credit when sharing or changing it.
+
+A second project-scoped skill, [hyperframes-motion-reel](https://github.com/Sunwood-ai-labs/hyperframes-motion-reel-skill), is installed in `.agents/skills/hyperframes-motion-reel/`. The25-second French customer marketing film is in `marketing-reel/`, with original code-generated music,60fps editable composition, pastry illustration and source credits. It preserves the first film.
