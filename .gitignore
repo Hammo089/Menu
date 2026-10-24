@@ -8,3 +8,12 @@ test-results/
 playwright-report/
 supabase/.temp/
 *.tsbuildinfo
+
+# Local launch-video rendering caches
+brag-output/composition/.hyperframes/
+brag-output/composition/node_modules/
+brag-output/composition/package-lock.json
+brag-output/render.log
+brag-output/composition/.preview/
+brag-output/work-*/
+brag-output/brag.poster.mp4

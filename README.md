@@ -58,3 +58,27 @@ npm run test:browser
 The database tests run the schema and seed in embedded PostgreSQL (PGlite), checking anonymous access, owner permissions, unauthorized writes, image policy isolation and concurrent publication. Browser tests cover mobile filtering, editing drafts, advertisement previews and timing, TV artwork, orientation persistence and product reflow. No live Supabase project or Vercel deployment is provisioned by these tests.
 
 On a local machine with a system Chromium, set `PLAYWRIGHT_CHROMIUM_EXECUTABLE`; CI uses Playwright’s installed browser. See [asset sources](docs/ASSETS.md).
+
+## Launch video and /brag
+
+Project-scoped [brag](https://github.com/latent-spaces/brag) is installed in
+[.agents/skills/brag/SKILL.md](.agents/skills/brag/SKILL.md), with the four local
+Hyperframes supporting skills. In a skill-aware coding agent opened on this
+repository, invoke `/brag` for a new video. Upstream version and rights are
+recorded in `.agents/skills/brag/INSTALLATION.md`.
+
+The first French customer-facing vertical launch film is in `brag-output/`:
+`brag.mp4`, `brag.jpg`, storyboard, share caption, asset credits, and editable
+Hyperframes composition. It uses public menu/signup screens, no real customer
+accounts. Generated cup artwork and the existing sandwich illustration are
+advertising visuals; see `brag-output/ASSETS.md`.
+
+```sh
+cd brag-output/composition
+npm run check
+npm run dev
+npm run render -- --quality delivery --output ../brag.mp4
+```
+
+Node 22+, Chromium and FFmpeg are required. The video CLI is pinned to 0.8.192.
+The MP4 includes a music credit; preserve the credit when sharing or changing it.

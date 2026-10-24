@@ -1,0 +1,29 @@
+{
+  "ok": true,
+  "errorCount": 0,
+  "warningCount": 2,
+  "infoCount": 0,
+  "findings": [
+    {
+      "code": "duplicate_media_discovery_risk",
+      "severity": "warning",
+      "message": "Detected 2 matching img entries with the same source/start/duration.",
+      "fixHint": "Avoid duplicated media nodes that can be discovered twice during compilation.",
+      "snippet": "img src=assets/images/flying-drinks.png data-start= data-duration=",
+      "file": "/workspace/blanco/brag-output/composition/compositions/hook.html"
+    },
+    {
+      "code": "duplicate_media_discovery_risk",
+      "severity": "warning",
+      "message": "Detected 2 matching img entries with the same source/start/duration.",
+      "fixHint": "Avoid duplicated media nodes that can be discovered twice during compilation.",
+      "snippet": "img src=assets/images/flying-drinks.png data-start= data-duration=",
+      "file": "/workspace/blanco/brag-output/composition/compositions/outro.html"
+    }
+  ],
+  "filesScanned": 5,
+  "_meta": {
+    "version": "0.8.192",
+    "updateAvailable": false
+  }
+}
