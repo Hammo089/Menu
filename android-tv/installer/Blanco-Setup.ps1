@@ -61,7 +61,7 @@ try {
     Write-Host 'The on-screen 10-character code is a pairing code, NOT your exit PIN.'
     Write-Host 'Optional display mode. Fire TV Home remains available. No full device lock enabled.' -ForegroundColor Green
     Write-Host 'Blanco requests launch on full TV boot. Test a real restart; Fire TV may block auto-launch.'
-    Write-Host 'Back + PIN opens Return to TV and the auto-start on/off option. Home remains unchanged.'
+    Write-Host 'Press Back 7 times in 5 seconds, then enter PIN to return to TV. Check Administration for settings.'
     Write-Host "Backup: $backup"
     if ($result.PreviousHome) { Write-Host "Previous Home: $($result.PreviousHome) (saved for restoration)" }
     Start-Process 'https://blanco-menu-one.vercel.app/admin/screens'

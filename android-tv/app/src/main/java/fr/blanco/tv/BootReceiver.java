@@ -13,6 +13,8 @@ public class BootReceiver extends BroadcastReceiver {
       Vault vault = RuntimeState.vault(context);
       JSONObject state = vault.read();
       if (!state.optBoolean("autoStart", true) || state.optBoolean("revoked")) return;
+      vault.put("ownerExited", false);
+      vault.put("maintenanceUntil", 0);
       vault.put("lastBootLaunch", "requested");
       context.startActivity(
           new Intent(context, MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));

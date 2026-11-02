@@ -38,6 +38,8 @@ public class MainActivity extends Activity {
   private boolean showingBlack = false, offlineMenu = false, lastOnline = false, manager = false;
   private Runnable next;
   private AlertDialog pinDialog;
+  private final DisplayPolicy.ExitGesture exitGesture = new DisplayPolicy.ExitGesture();
+  private Toast exitHint;
   private final BroadcastReceiver state =
       new BroadcastReceiver() {
         public void onReceive(Context c, Intent i) {
@@ -55,10 +57,6 @@ public class MainActivity extends Activity {
         .setFlags(
             WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
     getWindow().getDecorView().setSystemUiVisibility(5894);
-    if (Build.VERSION.SDK_INT >= 27) {
-      setShowWhenLocked(true);
-      setTurnScreenOn(true);
-    }
     root = new FrameLayout(this);
     root.setBackgroundColor(Color.BLACK);
     setContentView(root);
@@ -71,11 +69,7 @@ public class MainActivity extends Activity {
     FrameLayout.LayoutParams hotspot =
         new FrameLayout.LayoutParams(dp(100), dp(100), Gravity.TOP | Gravity.LEFT);
     root.addView(corner, hotspot);
-    corner.setOnLongClickListener(
-        v -> {
-          askPin();
-          return true;
-        });
+    corner.setOnClickListener(v -> exitPress());
     corner.setFocusable(false);
     if (Build.VERSION.SDK_INT >= 33)
       registerReceiver(state, new IntentFilter(Config.STATE), Context.RECEIVER_NOT_EXPORTED);
@@ -85,9 +79,11 @@ public class MainActivity extends Activity {
   }
 
   protected void onDestroy() {
+    ui.removeCallbacksAndMessages(null);
     unregisterReceiver(state);
     if (next != null) ui.removeCallbacks(next);
     if (pinDialog != null) pinDialog.dismiss();
+    if (exitHint != null) exitHint.cancel();
     if (web != null) web.destroy();
     if (video != null) video.stopPlayback();
     io.shutdownNow();
@@ -96,9 +92,21 @@ public class MainActivity extends Activity {
     super.onDestroy();
   }
 
+  protected void onNewIntent(Intent intent) {
+    super.onNewIntent(intent);
+    setIntent(intent);
+  }
+
   protected void onResume() {
     super.onResume();
+    if (getIntent().getBooleanExtra("blanco_auto_resume", false)
+        && (vault.read().optBoolean("ownerExited") || vault.read().optBoolean("revoked"))) {
+      RuntimeState.displayActive = false;
+      finish();
+      return;
+    }
     RuntimeState.displayActive = true;
+    vault.put("ownerExited", false);
     signature = "";
     getWindow().getDecorView().setSystemUiVisibility(5894);
     if (web != null) web.onResume();
@@ -109,21 +117,27 @@ public class MainActivity extends Activity {
     RuntimeState.displayActive = false;
     if (next != null) ui.removeCallbacks(next);
     if (video != null && video.isPlaying()) video.pause();
-    if (!manager) clearPlayer();
-    else if (web != null) web.onPause();
+    if (!manager) {
+      shownSetup = "";
+      clearPlayer();
+    } else if (web != null) web.onPause();
+    if (!manager) ui.postDelayed(() -> RuntimeState.resumeDisplay(this), 2000);
     super.onPause();
   }
 
   public void onBackPressed() {
-    askPin();
+    exitPress();
   }
 
-  public boolean onKeyLongPress(int key, android.view.KeyEvent e) {
-    if (key == android.view.KeyEvent.KEYCODE_MENU || key == android.view.KeyEvent.KEYCODE_BACK) {
+  private void exitPress() {
+    int count = exitGesture.press(SystemClock.elapsedRealtime());
+    if (exitHint != null) exitHint.cancel();
+    if (count == 7) {
       askPin();
-      return true;
+    } else {
+      exitHint = Toast.makeText(this, "Sortie : Retour " + count + "/7 · خروج", Toast.LENGTH_SHORT);
+      exitHint.show();
     }
-    return super.onKeyLongPress(key, e);
   }
 
   private int dp(int n) {
@@ -216,7 +230,7 @@ public class MainActivity extends Activity {
               shownSetup = "";
               refresh();
             }));
-    panel.addView(button("Sortie / خروج", this::askPin));
+    panel.addView(button("Retour ×7 / رجوع ٧ مرات", this::exitPress));
   }
 
   private void refresh() {
@@ -504,6 +518,7 @@ public class MainActivity extends Activity {
     JSONObject local = vault.read();
     JSONObject snapshot = local.optJSONObject("snapshot");
     if (snapshot == null) {
+      vault.put("ownerExited", true);
       finish();
       return;
     }
@@ -527,8 +542,12 @@ public class MainActivity extends Activity {
     field.setImportantForAutofill(View.IMPORTANT_FOR_AUTOFILL_NO_EXCLUDE_DESCENDANTS);
     field.setHint("6–12 chiffres / أرقام");
     LinearLayout box = new LinearLayout(this);
+    box.setOrientation(LinearLayout.VERTICAL);
     box.setPadding(dp(28), dp(10), dp(28), dp(10));
     box.addView(field, new LinearLayout.LayoutParams(-1, -2));
+    CheckBox settings = new CheckBox(this);
+    settings.setText("Administration plutôt que sortie / الإعدادات بدل الخروج");
+    box.addView(settings);
     pinDialog =
         new AlertDialog.Builder(this)
             .setTitle("Code de sortie / كود الخروج")
@@ -578,7 +597,8 @@ public class MainActivity extends Activity {
                                     vault.put("pinFailures", 0);
                                     vault.put("pinLockedUntil", 0);
                                     pinDialog.dismiss();
-                                    openManager();
+                                    if (settings.isChecked()) openManager();
+                                    else returnToTv();
                                   } else {
                                     int attempts = vault.read().optInt("pinFailures") + 1;
                                     vault.put("pinFailures", attempts);
@@ -596,6 +616,23 @@ public class MainActivity extends Activity {
     pinDialog.show();
     if (pinDialog.getWindow() != null)
       pinDialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_SECURE);
+  }
+
+  private void returnToTv() {
+    vault.put("ownerExited", true);
+    RuntimeState.displayActive = false;
+    manager = true;
+    clearPlayer();
+    vault.put("maintenanceUntil", 0);
+    try {
+      startActivity(
+          new Intent(Intent.ACTION_MAIN)
+              .addCategory(Intent.CATEGORY_HOME)
+              .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+      finishAndRemoveTask();
+    } catch (Exception unavailable) {
+      moveTaskToBack(true);
+    }
   }
 
   private void openManager() {
@@ -628,7 +665,7 @@ public class MainActivity extends Activity {
     panel.addView(text("Blanco TV · Administration", 28, Color.rgb(30, 60, 46)));
     panel.addView(
         text(
-            "Mode affichage facultatif / وضع عرض اختياري — Home reste disponible",
+            "Affichage continu · sortie : Retour ×7 + PIN / رجوع ٧ مرات ثم الكود",
             16,
             Color.DKGRAY));
     CheckBox autoStart = new CheckBox(this);
@@ -643,22 +680,7 @@ public class MainActivity extends Activity {
                 + "بعد الإقلاع الكامل؛ الخروج يبقى متاحاً.",
             14,
             Color.DKGRAY));
-    panel.addView(
-        button(
-            "Retour à Fire TV / الرجوع للتلفزيون",
-            () -> {
-              clearPlayer();
-              vault.put("maintenanceUntil", 0);
-              try {
-                startActivity(
-                    new Intent(Intent.ACTION_MAIN)
-                        .addCategory(Intent.CATEGORY_HOME)
-                        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
-                finishAndRemoveTask();
-              } catch (Exception unavailable) {
-                moveTaskToBack(true);
-              }
-            }));
+    panel.addView(button("Retour à Fire TV / الرجوع للتلفزيون", this::returnToTv));
     panel.addView(
         button(
             "Reprendre le kiosque / العودة للعرض",

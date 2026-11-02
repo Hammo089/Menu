@@ -8,6 +8,17 @@ import org.json.*;
 
 public class SyncService extends Service {
   private ScheduledExecutorService worker;
+  private final BroadcastReceiver screen =
+      new BroadcastReceiver() {
+        public void onReceive(Context context, Intent intent) {
+          if (Intent.ACTION_SCREEN_OFF.equals(intent.getAction())) {
+            RuntimeState.screenAwake = false;
+          } else if (Intent.ACTION_SCREEN_ON.equals(intent.getAction())) {
+            RuntimeState.screenAwake = true;
+            main.postDelayed(() -> RuntimeState.resumeDisplay(SyncService.this), 1500);
+          }
+        }
+      };
   private final Handler main = new Handler(Looper.getMainLooper());
 
   public void onCreate() {
@@ -29,6 +40,11 @@ public class SyncService extends Service {
             .setContentIntent(open)
             .build();
     startForeground(17, n);
+    RuntimeState.screenAwake = ((PowerManager) getSystemService(POWER_SERVICE)).isInteractive();
+    IntentFilter screens = new IntentFilter(Intent.ACTION_SCREEN_ON);
+    screens.addAction(Intent.ACTION_SCREEN_OFF);
+    if (Build.VERSION.SDK_INT >= 33) registerReceiver(screen, screens, Context.RECEIVER_EXPORTED);
+    else registerReceiver(screen, screens);
     worker = Executors.newSingleThreadScheduledExecutor();
     worker.scheduleWithFixedDelay(this::tick, 0, 15, TimeUnit.SECONDS);
   }
@@ -42,7 +58,9 @@ public class SyncService extends Service {
   }
 
   public void onDestroy() {
+    unregisterReceiver(screen);
     if (worker != null) worker.shutdownNow();
+    main.removeCallbacksAndMessages(null);
     super.onDestroy();
   }
 
@@ -112,6 +130,7 @@ public class SyncService extends Service {
     } finally {
       RuntimeState.notifyUi(this);
       scheduleTick();
+      main.post(() -> RuntimeState.resumeDisplay(this));
     }
   }
 
@@ -158,7 +177,7 @@ public class SyncService extends Service {
         return;
       } else if (kind.equals("reload") || kind.equals("restart_app")) {
         if (!RuntimeState.displayActive) {
-          ack(id, "ignored", "Blanco fermé : ouvrez l’application depuis Fire TV");
+          ack(id, "unsupported", "Blanco en arrière-plan : reprise réservée à la session active");
           return;
         }
         main.post(

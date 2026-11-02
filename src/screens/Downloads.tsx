@@ -32,7 +32,7 @@ export default function Downloads() {
           <div className="tv-download-icon">
             <Monitor size={28} />
           </div>
-          <span>WINDOWS 10 / 11 · v1.3 · ZIP · 8 MB</span>
+          <span>WINDOWS 10 / 11 · v1.4 · ZIP · 8 MB</span>
           <h2>{t('أداة التثبيت للكمبيوتر', 'Installation depuis Windows')}</h2>
           <p>
             {t(
@@ -40,7 +40,7 @@ export default function Downloads() {
               'Saisissez l’IP du téléviseur et autorisez la connexion. L’outil inspecte d’abord la TV puis installe, sur votre choix, un affichage facultatif sans modifier l’accueil.',
             )}
           </p>
-          <a className="tv-download-primary" href="/downloads/Blanco-TV-Windows.zip?v=1.3" download>
+          <a className="tv-download-primary" href="/downloads/Blanco-TV-Windows.zip?v=1.4" download>
             <Download size={19} />
             {t('تحميل أداة Windows', 'Télécharger pour Windows')}
           </a>
@@ -55,7 +55,7 @@ export default function Downloads() {
           <div className="tv-download-icon">
             <Download size={28} />
           </div>
-          <span>ANDROID TV 8+ · v1.3 · APK</span>
+          <span>ANDROID TV 8+ · v1.4 · APK</span>
           <h2>{t('تطبيق التلفزيون', 'Application pour le téléviseur')}</h2>
           <p>
             {t(
@@ -63,7 +63,7 @@ export default function Downloads() {
               'Pour une installation manuelle sur le téléviseur. Ouvrez l’application et scannez le QR pour associer l’écran au compte administrateur Blanco.',
             )}
           </p>
-          <a className="tv-download-secondary" href="/downloads/blanco-tv-pilot.apk?v=1.3" download>
+          <a className="tv-download-secondary" href="/downloads/blanco-tv-pilot.apk?v=1.4" download>
             <Download size={19} />
             {t('تحميل تطبيق التلفزيون', 'Télécharger l’APK')}
           </a>
@@ -99,8 +99,8 @@ export default function Downloads() {
         </ol>
         <p>
           {t(
-            'هذه النسخة وضع عرض اختياري وليست قفلاً كاملاً: زر Home يبقى متاحاً، والرجوع بالكود يفتح خيار العودة للتلفزيون. لا تغيير للمشغّل أو إدارة الجهاز، مع محاولة فتح Blanco بعد الإقلاع الكامل وخيار لتعطيلها من داخل التطبيق. بعد الإعداد، افصل ADB وأغلق تصحيح الشبكة.',
-            'Affichage facultatif sans verrouillage système : Home reste disponible et le PIN ouvre le retour à la TV. Aucun changement de lanceur, de gestion de l’appareil ; une ouverture est demandée après le démarrage complet, désactivable dans l’application. Déconnectez ADB et désactivez le débogage réseau après installation.',
+            'هذه النسخة وضع عرض اختياري وليست قفلاً كاملاً: زر Home يبقى متاحاً، وللخروج اضغط رجوع ٧ مرات خلال ٥ ثوانٍ ثم أدخل الكود. لا تغيير للمشغّل أو إدارة الجهاز، مع محاولة استئناف Blanco بعد السكون وإعادته للواجهة أثناء جلسة العرض. الخروج الصحيح بالكود يوقف الاستئناف حتى فتح التطبيق يدوياً أو الإقلاع الكامل إذا كان مفعلاً. Fire TV قد يمنع الاستئناف التلقائي. بعد الإعداد، افصل ADB وأغلق تصحيح الشبكة.',
+            'Affichage facultatif sans verrouillage système : Home reste disponible et Retour ×7 en 5 secondes puis le PIN permet de sortir. Aucun changement de lanceur, de gestion de l’appareil ; une reprise est demandée au réveil et pendant la session d’affichage. Une sortie par PIN est respectée jusqu’à l’ouverture manuelle ou au prochain démarrage complet si activé. Fire TV peut refuser la reprise. Déconnectez ADB et désactivez le débogage réseau après installation.',
           )}
         </p>
         <a href="/admin/screens">

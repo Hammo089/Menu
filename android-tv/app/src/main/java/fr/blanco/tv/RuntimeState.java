@@ -8,6 +8,9 @@ import org.json.*;
 
 final class RuntimeState {
   static volatile boolean displayActive = false;
+  static volatile boolean screenAwake = true;
+  static volatile long lastDisplayRequest = 0;
+  static volatile String displayRequest = "not-tested";
   static volatile String playbackError = "";
   static volatile boolean cachedMenu = false;
   static volatile Vault vault;
@@ -72,6 +75,31 @@ final class RuntimeState {
     c.sendBroadcast(new Intent(Config.STATE).setPackage(c.getPackageName()));
   }
 
+  static void resumeDisplay(Context c) {
+    try {
+      JSONObject local = vault(c).read();
+      boolean interactive =
+          ((PowerManager) c.getSystemService(Context.POWER_SERVICE)).isInteractive();
+      if (!DisplayPolicy.mayResume(
+          local.optJSONObject("snapshot") != null,
+          local.optBoolean("revoked"),
+          local.optBoolean("ownerExited"),
+          displayActive,
+          screenAwake && interactive,
+          local.optLong("maintenanceUntil") > System.currentTimeMillis())) return;
+      long elapsed = SystemClock.elapsedRealtime();
+      if (lastDisplayRequest != 0 && elapsed - lastDisplayRequest < 30000) return;
+      lastDisplayRequest = elapsed;
+      displayRequest = "requested";
+      c.startActivity(
+          new Intent(c, MainActivity.class)
+              .putExtra("blanco_auto_resume", true)
+              .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP));
+    } catch (Exception denied) {
+      displayRequest = "blocked";
+    }
+  }
+
   static JSONObject status(Context c) throws JSONException {
     return new JSONObject()
         .put("contentError", playbackError)
@@ -80,8 +108,10 @@ final class RuntimeState {
         .put("manufacturer", Build.MANUFACTURER)
         .put("osVersion", Build.VERSION.RELEASE)
         .put("sdk", Build.VERSION.SDK_INT)
-        .put("appVersion", "1.3.0-autostart")
+        .put("appVersion", "1.4.0-display")
         .put("displayActive", displayActive)
+        .put("ownerExited", vault(c).read().optBoolean("ownerExited"))
+        .put("displayRequest", displayRequest)
         .put("optionalDisplay", true)
         .put("autoStart", vault(c).read().optBoolean("autoStart", true))
         .put("lastBootLaunch", vault(c).read().optString("lastBootLaunch", "not-tested"))

@@ -1,3 +1,4 @@
+import fr.blanco.tv.DisplayPolicy;
 import fr.blanco.tv.PinPolicy;
 import fr.blanco.tv.SchedulePolicy;
 import java.time.*;
@@ -16,6 +17,38 @@ public class PolicyTest {
   }
 
   public static void main(String[] args) {
+    DisplayPolicy.ExitGesture gesture = new DisplayPolicy.ExitGesture();
+    for (int i = 0; i < 6; i++)
+      check(gesture.press(1000 + i * 400) < 7, "Six presses must not open PIN");
+    check(gesture.press(3400) == 7, "Seventh press opens PIN exactly once");
+    check(gesture.press(3500) == 1, "Gesture resets after unlock prompt");
+    check(gesture.press(9000) == 1, "Slow unrelated presses must not accumulate");
+    for (int i = 0; i < 5; i++) gesture.press(9100 + i * 100);
+    check(gesture.press(9700) == 7, "New seven-press sequence works after timeout");
+    check(
+        DisplayPolicy.mayResume(true, false, false, false, true, false),
+        "Active display resumes on wake");
+    check(
+        !DisplayPolicy.mayResume(true, false, true, false, true, false),
+        "PIN exit is respected even on wake");
+    check(
+        !DisplayPolicy.mayResume(true, false, true, false, false, false),
+        "PIN exit also stays closed asleep");
+    check(
+        !DisplayPolicy.mayResume(true, false, false, false, false, false),
+        "Never launch into TV sleep");
+    check(
+        !DisplayPolicy.mayResume(true, false, false, false, true, true),
+        "Owner maintenance may use TV settings");
+    check(
+        !DisplayPolicy.mayResume(false, false, false, false, true, false),
+        "Unpaired screen may not take focus");
+    check(
+        !DisplayPolicy.mayResume(true, true, false, false, true, false),
+        "Revoked screen may not take focus");
+    check(
+        !DisplayPolicy.mayResume(true, false, false, true, true, false),
+        "Do not reload active display");
     String salt = "000102030405060708090a0b0c0d0e0f",
         hash = "2f59d5cc202e6a80df5c7d1029b1bf44f6b09c46a483a78f84b2f838d772f202";
     check(

@@ -159,10 +159,7 @@ export default function ScreensAdmin() {
           <Download size={18} />{' '}
           {l('تنزيل تطبيق التلفزيون — نسخة تجريبية', 'Télécharger l’application TV — pilote')}
         </a>
-        <a
-          className="button"
-          href="/telecharger"
-        >
+        <a className="button" href="/telecharger">
           <Download size={18} />{' '}
           {l('أداة التثبيت من الكمبيوتر — Windows', 'Installation depuis Windows')}
         </a>
@@ -462,11 +459,13 @@ function DeviceEditor({
       </div>
       <p>
         {l('آخر حالة أبلغ عنها الجهاز', 'Dernier état signalé par l’appareil')}:{' '}
-        {status.screenOn === false
-          ? l('سكون', 'Veille')
-          : status.blackScreen === true
-            ? l('شاشة سوداء', 'Écran noir')
-            : l('عرض المحتوى', 'Affichage')}
+        {status.ownerExited === true
+          ? l('خروج بالكود · واجهة التلفزيون', 'Sortie par PIN · accueil TV')
+          : status.screenOn === false
+            ? l('سكون', 'Veille')
+            : status.blackScreen === true
+              ? l('شاشة سوداء', 'Écran noir')
+              : l('عرض المحتوى', 'Affichage')}
         {status.cachedMenu === true ? l(' · منيو محفوظة محليًا', ' · menu en cache') : ''}
       </p>
       {typeof status.contentError === 'string' && status.contentError && (
