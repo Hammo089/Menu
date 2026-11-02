@@ -48,6 +48,7 @@ public class MainActivity extends Activity {
   public void onCreate(Bundle s) {
     super.onCreate(s);
     ref = new WeakReference<>(this);
+    RuntimeState.displayActive = true;
     vault = RuntimeState.vault(this);
     cache = new MediaCache(this);
     getWindow()
@@ -97,8 +98,19 @@ public class MainActivity extends Activity {
 
   protected void onResume() {
     super.onResume();
+    RuntimeState.displayActive = true;
+    signature = "";
     getWindow().getDecorView().setSystemUiVisibility(5894);
+    if (web != null) web.onResume();
     if (!manager) refresh();
+  }
+
+  protected void onPause() {
+    RuntimeState.displayActive = false;
+    if (next != null) ui.removeCallbacks(next);
+    if (video != null && video.isPlaying()) video.pause();
+    if (web != null) web.onPause();
+    super.onPause();
   }
 
   public void onBackPressed() {
@@ -207,7 +219,7 @@ public class MainActivity extends Activity {
   }
 
   private void refresh() {
-    if (manager) return;
+    if (manager || !RuntimeState.displayActive) return;
     JSONObject local = vault.read(), snapshot = local.optJSONObject("snapshot");
     if (local.optBoolean("revoked")) {
       black.setVisibility(View.GONE);
@@ -231,7 +243,6 @@ public class MainActivity extends Activity {
     }
     shownSetup = "";
     getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-    enableKiosk();
     boolean open = RuntimeState.open(this);
     if (!open) {
       if (next != null) {
@@ -265,20 +276,6 @@ public class MainActivity extends Activity {
     }
   }
 
-  private void enableKiosk() {
-    try {
-      ActivityManager am = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
-      if (am.getLockTaskModeState() == ActivityManager.LOCK_TASK_MODE_LOCKED) return;
-      if (RuntimeState.owner(this)) {
-        DevicePolicyManager p = RuntimeState.policy(this);
-        p.setLockTaskPackages(RuntimeState.admin(this), new String[] {getPackageName()});
-        if (Build.VERSION.SDK_INT >= 28) p.setLockTaskFeatures(RuntimeState.admin(this), 0);
-        startLockTask();
-      }
-    } catch (Exception ignored) {
-    }
-  }
-
   public void reload() {
     signature = "";
     manager = false;
@@ -287,7 +284,7 @@ public class MainActivity extends Activity {
   }
 
   private void play(boolean refreshCache) {
-    if (manager || !RuntimeState.open(this)) return;
+    if (manager || !RuntimeState.displayActive || !RuntimeState.open(this)) return;
     JSONObject snapshot = vault.read().optJSONObject("snapshot");
     if (snapshot == null) return;
     JSONObject cfg = snapshot.optJSONObject("config");
@@ -626,12 +623,25 @@ public class MainActivity extends Activity {
     panel.addView(text("Blanco TV · Administration", 28, Color.rgb(30, 60, 46)));
     panel.addView(
         text(
-            RuntimeState.owner(this)
-                ? "Kiosque administré / وضع مُدار"
-                : "Mode affichage : Home et les réglages système peuvent permettre de sortir.\n"
-                    + "قفل كامل غير مضمون بدون إدارة الجهاز.",
+            "Mode affichage facultatif / وضع عرض اختياري — Home reste disponible",
             16,
             Color.DKGRAY));
+    panel.addView(
+        button(
+            "Retour à Fire TV / الرجوع للتلفزيون",
+            () -> {
+              clearPlayer();
+              vault.put("maintenanceUntil", 0);
+              try {
+                startActivity(
+                    new Intent(Intent.ACTION_MAIN)
+                        .addCategory(Intent.CATEGORY_HOME)
+                        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+                finishAndRemoveTask();
+              } catch (Exception unavailable) {
+                moveTaskToBack(true);
+              }
+            }));
     panel.addView(
         button(
             "Reprendre le kiosque / العودة للعرض",
@@ -649,34 +659,6 @@ public class MainActivity extends Activity {
                 startActivity(new Intent(android.provider.Settings.ACTION_SETTINGS));
               } catch (Exception e) {
                 Toast.makeText(this, "Indisponible", Toast.LENGTH_SHORT).show();
-              }
-            }));
-    panel.addView(
-        button(
-            "Choisir l’écran d’accueil / اختيار الواجهة",
-            () -> {
-              try {
-                startActivity(new Intent(android.provider.Settings.ACTION_HOME_SETTINGS));
-              } catch (Exception e) {
-                Toast.makeText(
-                        this, "À configurer selon le modèle / حسب الموديل", Toast.LENGTH_LONG)
-                    .show();
-              }
-            }));
-    panel.addView(
-        button(
-            "Autoriser la veille de l’appareil / صلاحية السكون",
-            () -> {
-              Intent i = new Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN);
-              i.putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, RuntimeState.admin(this));
-              i.putExtra(
-                  DevicePolicyManager.EXTRA_ADD_EXPLANATION,
-                  "Autorise uniquement le verrouillage demandé depuis votre administration"
-                      + " Blanco.");
-              try {
-                startActivity(i);
-              } catch (Exception e) {
-                Toast.makeText(this, "Non pris en charge", Toast.LENGTH_LONG).show();
               }
             }));
     panel.addView(

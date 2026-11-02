@@ -1,42 +1,26 @@
-BLANCO TV - WINDOWS 10/11
+BLANCO TV - WINDOWS 10/11 - OPTIONAL DISPLAY 1.2
 
-1. Extract ALL files from the ZIP. Do not run from inside the ZIP.
-2. Double-click Start-Blanco.cmd. No administrator account or Python required.
-3. TV and computer must be on the same private network.
-4. Enable Developer options and USB/network debugging on the TV.
-5. Enter the TV IP (default port 5555). If Android shows Wireless debugging,
-   use its connection port and its separate pairing IP/port + six-digit code.
-6. Accept the authorization dialog ON THE TV, then press Enter on the computer.
-7. The tool verifies package hashes, saves the package list and previous Home,
-   installs Blanco, opens it, sets Home where supported, and attempts managed
-   kiosk without deleting anything. If Android refuses Device Owner, display
-   mode remains; send the model to finish the setup safely.
-8. Scan the QR ON THE TV with your phone. Sign in with your Blanco owner account.
-   The pairing code is pre-filled. Choose the screen name and your private exit
-   PIN. The app activates its lock only AFTER pairing and PIN setup.
-9. Back / long Menu / long press corner opens the exit PIN dialog.
-   Pairing code and Android wireless code are NOT exit PINs.
-10. After checking the app, press Enter in the installer to disconnect ADB.
-    Disable network debugging in TV settings. Normal management uses HTTPS.
+1. Extract ALL files, then double-click Start-Blanco.cmd.
+2. Put PC and TV on the same LAN. Enable ADB debugging on the TV.
+3. Enter TV IP and accept authorization ON THE TV.
+   Wireless debugging users also enter its separate pairing port and code.
+4. The first inspection ONLY READS the model, Android version and current Home.
+   Installation is OFF by default. Answer y to install/open the optional app.
+5. The tool installs/updates Blanco and opens it. It NEVER changes default Home,
+   sets Device Owner, disables apps, removes accounts or factory-resets anything.
+6. Scan the on-screen QR, sign in to Blanco administration and choose an exit PIN.
+7. Back -> enter PIN -> Retour a Fire TV returns to the normal TV interface.
+   Home also remains available. This is fullscreen display, NOT a system lock.
+8. Open Blanco from your TV apps whenever you want the menu. It does not take
+   over startup or reopen itself after you exit. Remote reload/wake does not
+   bring it back from the background; power commands are disabled in this build.
+9. Disconnect using the installer and disable network debugging after testing.
 
-This pilot is not hardware-validated. Full kiosk/auto-start/wake/sleep depend on
-TV support and provisioning. Developer options alone do not guarantee them.
-No factory reset, account removal, launcher disabling, root or router changes.
-The tool stops on installation failure (including incompatible APK signature).
-It never uninstalls an existing Blanco app automatically.
-
+Android 8+ with System WebView required. Fire OS 7 is based on Android 9;
+actual TV/Windows compatibility still requires a physical test. No guarantee
+is made against every device failure. Keep the original Fire TV launcher.
+No signing-key mismatch is fixed by uninstalling the old app automatically.
+If an OLDER installer already enabled device management or changed Home,
+this tool does not silently reverse that configuration: report it first.
 Backups: %LOCALAPPDATA%\BlancoTV\Backups
-previous-home.txt contains the old Home component. To restore the old launcher,
-exit Blanco using your PIN, open Android Settings, and select the previous Home.
-A qualified administrator may also use adb shell cmd package set-home-activity
-with the component saved there, after an authorized ADB connection.
-Device Owner is not automatically removed; exiting kiosk does not erase management.
-
-ADB is Google's unmodified Android SDK Platform-Tools. Google license notices
-are included inside platform-tools. Blanco QR uses node-qrcode under MIT; its
-license is included in the APK/source. Keep all accompanying license files.
-
-طريقة الاستخدام:
-فك الضغط كاملاً، شغّل Start-Blanco.cmd، أدخل عنوان التلفزيون ووافق على الاتصال
-من التلفزيون. بعد التثبيت امسح QR الظاهر عليه، سجّل دخول الإدارة واختر كود خروجك.
-إذا النظام رفض الكيوسك الكامل، الأداة لا تمسح الجهاز؛ ابعت موديل التلفزيون.
+ADB is Google's unmodified Platform-Tools; accompanying licenses are retained.

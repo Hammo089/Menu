@@ -36,8 +36,8 @@ export default function Downloads() {
           <h2>{t('أداة التثبيت للكمبيوتر', 'Installation depuis Windows')}</h2>
           <p>
             {t(
-              'تدخل IP التلفزيون، توافق على الاتصال، والأداة بتثبّت Blanco وبتحاول تفعّل الكيوسك حسب دعم الجهاز.',
-              'Saisissez l’IP du téléviseur et autorisez la connexion. L’outil installe Blanco et tente d’activer le kiosque selon les capacités de l’appareil.',
+              'تدخل IP التلفزيون، توافق على الاتصال، بتفحص الجهاز أولاً، وبعد اختيارك بتثبّت Blanco كتطبيق عرض اختياري بدون تغيير واجهة التلفزيون.',
+              'Saisissez l’IP du téléviseur et autorisez la connexion. L’outil inspecte d’abord la TV puis installe, sur votre choix, un affichage facultatif sans modifier l’accueil.',
             )}
           </p>
           <a className="tv-download-primary" href="/downloads/Blanco-TV-Windows.zip" download>
@@ -99,8 +99,8 @@ export default function Downloads() {
         </ol>
         <p>
           {t(
-            'القفل الكامل والتشغيل والإطفاء بيعتمدوا على موديل التلفزيون. الأداة ما بتمسح بيانات الجهاز، وإذا رفض الكيوسك بتخبرك. بعد الإعداد، افصل ADB وأغلق تصحيح الشبكة.',
-            'Le verrouillage intégral et les fonctions d’alimentation dépendent du modèle. L’outil n’efface pas les données et signale tout refus du mode kiosque. Déconnectez ADB et désactivez le débogage réseau après installation.',
+            'هذه النسخة وضع عرض اختياري وليست قفلاً كاملاً: زر Home يبقى متاحاً، والرجوع بالكود يفتح خيار العودة للتلفزيون. لا تغيير للمشغّل أو إدارة الجهاز أو التشغيل التلقائي. بعد الإعداد، افصل ADB وأغلق تصحيح الشبكة.',
+            'Affichage facultatif sans verrouillage système : Home reste disponible et le PIN ouvre le retour à la TV. Aucun changement de lanceur, de gestion de l’appareil ou de démarrage automatique. Déconnectez ADB et désactivez le débogage réseau après installation.',
           )}
         </p>
         <a href="/admin/screens">

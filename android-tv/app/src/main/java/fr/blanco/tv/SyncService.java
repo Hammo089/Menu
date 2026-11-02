@@ -153,52 +153,26 @@ public class SyncService extends Service {
     ids.put(id);
     v.put("executed", ids);
     try {
-      if (kind.equals("sleep")) {
-        if (!RuntimeState.policy(this).isAdminActive(RuntimeState.admin(this))) {
-          ack(id, "unsupported", "Administration de l’appareil non activée");
-          return;
-        }
-        ack(id, "requested", "Mise en veille demandée ; vérifier l’état de la TV");
-        RuntimeState.policy(this).lockNow();
-      } else if (kind.equals("reboot")) {
-        if (!RuntimeState.owner(this)) {
-          ack(id, "unsupported", "Réservé au mode Device Owner");
-          return;
-        }
-        ack(id, "requested", "Redémarrage Android demandé");
-        RuntimeState.policy(this).reboot(RuntimeState.admin(this));
-      } else if (kind.equals("wake")) {
-        PowerManager pm = (PowerManager) getSystemService(POWER_SERVICE);
-        PowerManager.WakeLock lock =
-            pm.newWakeLock(
-                PowerManager.SCREEN_BRIGHT_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP,
-                "Blanco:Wake");
-        lock.acquire(2000);
-        show();
-        ack(id, "requested", "Réveil demandé ; dépend du modèle et de la veille");
+      if (kind.equals("sleep") || kind.equals("wake") || kind.equals("reboot")) {
+        ack(id, "unsupported", "Mode affichage facultatif : alimentation système non modifiée");
+        return;
       } else if (kind.equals("reload") || kind.equals("restart_app")) {
+        if (!RuntimeState.displayActive) {
+          ack(id, "ignored", "Blanco fermé : ouvrez l’application depuis Fire TV");
+          return;
+        }
         main.post(
             () -> {
               MainActivity a = MainActivity.current();
-              if (a != null) {
+              if (a != null && RuntimeState.displayActive) {
                 if (kind.equals("restart_app")) a.recreate();
                 else a.reload();
-              } else show();
+              }
             });
         ack(id, "requested", "Demande transmise à l’application");
       } else ack(id, "unsupported", "Commande inconnue");
     } catch (Exception e) {
       ack(id, "failed", "Le système Android a refusé cette action");
-    }
-  }
-
-  private void show() {
-    try {
-      RuntimeState.vault(this).put("maintenanceUntil", 0);
-      startActivity(
-          new Intent(this, MainActivity.class)
-              .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP));
-    } catch (Exception ignored) {
     }
   }
 }

@@ -7,6 +7,7 @@ import android.os.*;
 import org.json.*;
 
 final class RuntimeState {
+  static volatile boolean displayActive = false;
   static volatile String playbackError = "";
   static volatile boolean cachedMenu = false;
   static volatile Vault vault;
@@ -79,10 +80,12 @@ final class RuntimeState {
         .put("manufacturer", Build.MANUFACTURER)
         .put("osVersion", Build.VERSION.RELEASE)
         .put("sdk", Build.VERSION.SDK_INT)
-        .put("appVersion", "1.0.0-pilot")
+        .put("appVersion", "1.2.0-optional")
+        .put("displayActive", displayActive)
+        .put("optionalDisplay", true)
         .put("deviceOwner", owner(c))
         .put("defaultHome", home(c))
-        .put("canSleep", policy(c).isAdminActive(admin(c)))
+        .put("canSleep", false)
         .put("wakeGuaranteed", false)
         .put("webViewAvailable", android.webkit.WebView.getCurrentWebViewPackage() != null)
         .put("screenOn", ((PowerManager) c.getSystemService(Context.POWER_SERVICE)).isInteractive())

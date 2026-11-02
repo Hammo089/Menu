@@ -9,6 +9,7 @@ for item in "$TASK_TOOLS/aapt2" "$TASK_TOOLS/d8" "$TASK_TOOLS/apksigner" "$TASK_
  if [ ! -f "$item" ]; then echo "Missing Android SDK tool: $item" >&2; exit 1; fi
 done
 node "$TASK_ROOT/scripts/prepare-assets.mjs"
+rm -rf "$TASK_OUT/classes" "$TASK_OUT/dex"
 mkdir -p "$TASK_OUT/classes" "$TASK_OUT/dex" "$TASK_ROOT/dist" "$TASK_ROOT/.signing"
 find "$TASK_ROOT/app/src/main/java" -name '*.java' > "$TASK_OUT/sources.txt"
 javac --release 8 -classpath "$TASK_PLATFORM" -d "$TASK_OUT/classes" @"$TASK_OUT/sources.txt"
@@ -25,4 +26,4 @@ if [ ! -f "$TASK_KEY" ]; then keytool -genkeypair -keystore "$TASK_KEY" -storepa
 "$TASK_TOOLS/apksigner" sign --ks "$TASK_KEY" --ks-key-alias androiddebugkey --ks-pass pass:android --key-pass pass:android --out "$TASK_ROOT/dist/blanco-tv-pilot.apk" "$TASK_OUT/aligned.apk"
 "$TASK_TOOLS/apksigner" verify --verbose "$TASK_ROOT/dist/blanco-tv-pilot.apk"
 (cd "$TASK_ROOT/dist" && sha256sum blanco-tv-pilot.apk) > "$TASK_ROOT/dist/SHA256SUMS"
-echo "Built $TASK_ROOT/dist/blanco-tv-pilot.apk (pilot; test on the actual TV before managed deployment)."
+echo "Built $TASK_ROOT/dist/blanco-tv-pilot.apk (pilot; test on the actual TV before use)."

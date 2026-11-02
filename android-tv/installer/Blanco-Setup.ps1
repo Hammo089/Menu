@@ -47,14 +47,20 @@ try {
     Write-Host $connected.Output
     Read-Host 'After accepting on the TV, press Enter' | Out-Null
     $bridge = { param([string[]]$Arguments) Call-Adb -AdbArgs (@('-s',$endpoint) + $Arguments) }
-    $managed = (Read-Host 'Try full managed kiosk (without reset/account removal)? [Y/n]') -ne 'n'
+    $inspection = Get-BlancoInspection -Bridge $bridge
+    Write-Host "Read-only check: $($inspection.Model), Android SDK $($inspection.Sdk)"
+    Write-Host "Current Home: $($inspection.PreviousHome)"
+    Write-Host 'The inspection has not changed any TV settings.' -ForegroundColor Green
+    if ((Read-Host 'Install/open optional Blanco display app? Home and device management stay unchanged. [y/N]') -ne 'y') {
+        Write-Host 'Inspection finished. Nothing installed or changed.'
+        return
+    }
     $backup = Join-Path $env:LOCALAPPDATA ('BlancoTV/Backups/' + (Get-Date -Format 'yyyyMMdd-HHmmss'))
-    $result = Invoke-BlancoSetup -Bridge $bridge -ApkPath $apk -Managed $managed -BackupDirectory $backup
+    $result = Invoke-BlancoSetup -Bridge $bridge -ApkPath $apk -BackupDirectory $backup
     Write-Host "`nInstalled. Scan the QR on the TV, sign in to Blanco and choose your EXIT PIN." -ForegroundColor Green
     Write-Host 'The on-screen 10-character code is a pairing code, NOT your exit PIN.'
-    if ($result.Managed) { Write-Host 'Managed mode configured. App locks after pairing and exit PIN selection.' -ForegroundColor Green }
-    else { Write-Host 'Display mode installed. Full kiosk unavailable/not requested. Home may still exit the app.' -ForegroundColor Yellow; Write-Host 'No accounts removed and no reset performed. Send the TV model for the next step.' }
-    if (-not $result.HomeSet) { Write-Host 'Select Blanco TV manually as the default Home app in Android settings.' -ForegroundColor Yellow }
+    Write-Host 'Optional display mode. Fire TV Home remains available. No full device lock enabled.' -ForegroundColor Green
+    Write-Host 'Open Blanco manually when needed. Back + your PIN opens Return to TV.'
     Write-Host "Backup: $backup"
     if ($result.PreviousHome) { Write-Host "Previous Home: $($result.PreviousHome) (saved for restoration)" }
     Start-Process 'https://blanco-menu-one.vercel.app/admin/screens'
@@ -65,4 +71,7 @@ try {
     Write-Host "`nInstallation stopped: $($_.Exception.Message)" -ForegroundColor Red
     Write-Host 'Do not factory-reset or remove accounts. Check TV authorization, IP/port and model.'
     if (Test-Path variable:adb) { if (Test-Path variable:endpoint) { try { $null = Call-Adb -AdbArgs @('disconnect',$endpoint) } catch {} } }
-} finally { Read-Host 'Press Enter to close' | Out-Null }
+} finally {
+    if (Test-Path variable:adb) { if (Test-Path variable:endpoint) { try { $null = Call-Adb -AdbArgs @('disconnect',$endpoint) } catch {} } }
+    Read-Host 'Press Enter to close' | Out-Null
+}
