@@ -21,6 +21,15 @@ test('TV pairing, private device secrets, owner authorization, command isolation
       'utf8',
     ),
   );
+  await db.exec(
+    readFileSync(
+      new URL(
+        '../supabase/migrations/20261102173734_tv_android9_utc_timestamps.sql',
+        import.meta.url,
+      ),
+      'utf8',
+    ),
+  );
   async function role(id) {
     await db.exec('reset role');
     await db.query("select set_config('request.jwt.claim.sub',$1,false)", [id || '']);
@@ -38,6 +47,7 @@ test('TV pairing, private device secrets, owner authorization, command isolation
   assert.ok((await rpc('pair', { token: 'short' })).error);
   const pair = await rpc('pair', { token: a });
   assert.match(pair.pairCode, /^[A-F0-9]{10}$/);
+  assert.match(pair.expiresAt, /Z$/, 'Pair expiry is compatible with Android 9 ISO_INSTANT');
   assert.equal(
     (await rpc('pair', { token: a })).pairCode,
     pair.pairCode,
@@ -111,6 +121,7 @@ test('TV pairing, private device secrets, owner authorization, command isolation
   assert.ok((await rpc('sync', { token: invalid })).error);
   const sync = await rpc('sync', { token: a, status: { model: 'TestTV', deviceOwner: false } });
   assert.equal(sync.paired, true);
+  assert.match(sync.serverNow, /Z$/, 'Server clock must parse on Android 9');
   assert.equal(sync.pinAuth.hash, hash);
   assert.equal(sync.config.rotation, 90);
   assert.ok(sync.menu);
@@ -132,6 +143,7 @@ test('TV pairing, private device secrets, owner authorization, command isolation
   );
   await role();
   const pending = await rpc('sync', { token: a });
+  assert.match(pending.commands[0].expiresAt, /Z$/, 'Command expiry must parse on Android 9');
   assert.equal(pending.commands.length, 1);
   await rpc('sync', { token: b, acks: [{ id: cmd.commandId, result: 'ok' }] });
   await role(owner);
