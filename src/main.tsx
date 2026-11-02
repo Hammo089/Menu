@@ -6,10 +6,17 @@ import './styles.css';
 const Admin = lazy(() => import('./Admin'));
 const TVMenu = lazy(() => import('./TVMenu'));
 const CustomerLoyalty = lazy(() => import('./loyalty/Customer'));
+const Downloads = lazy(() => import('./screens/Downloads'));
 const ScreensAdmin = lazy(() => import('./screens/Admin'));
 const LoyaltyAdmin = lazy(() => import('./loyalty/Admin'));
 const path = window.location.pathname.replace(/\/$/, '') || '/';
 function App() {
+  if (path === '/telecharger')
+    return (
+      <Suspense fallback={<div className="loading-screen">Blanco</div>}>
+        <Downloads />
+      </Suspense>
+    );
   if (
     ['/fidelite', '/fidelite/confidentialite', '/admin/fidelite', '/admin/screens'].includes(path)
   )

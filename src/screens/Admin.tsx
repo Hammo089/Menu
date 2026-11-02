@@ -161,7 +161,7 @@ export default function ScreensAdmin() {
         </a>
         <a
           className="button"
-          href="https://raw.githubusercontent.com/Hammo089/Menu/main/android-tv/dist/Blanco-TV-Windows.zip"
+          href="/telecharger"
         >
           <Download size={18} />{' '}
           {l('أداة التثبيت من الكمبيوتر — Windows', 'Installation depuis Windows')}

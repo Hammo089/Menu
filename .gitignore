@@ -34,3 +34,6 @@ android-tv/.signing/
 android-tv/app/src/main/assets/offline-menu.html
 android-tv/backup/
 android-tv/local.properties
+
+# Download assets are copied from versioned Android artifacts at build time
+public/downloads/
