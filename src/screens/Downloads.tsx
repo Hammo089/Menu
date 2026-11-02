@@ -32,7 +32,7 @@ export default function Downloads() {
           <div className="tv-download-icon">
             <Monitor size={28} />
           </div>
-          <span>WINDOWS 10 / 11 · ZIP · 8 MB</span>
+          <span>WINDOWS 10 / 11 · v1.3 · ZIP · 8 MB</span>
           <h2>{t('أداة التثبيت للكمبيوتر', 'Installation depuis Windows')}</h2>
           <p>
             {t(
@@ -40,7 +40,7 @@ export default function Downloads() {
               'Saisissez l’IP du téléviseur et autorisez la connexion. L’outil inspecte d’abord la TV puis installe, sur votre choix, un affichage facultatif sans modifier l’accueil.',
             )}
           </p>
-          <a className="tv-download-primary" href="/downloads/Blanco-TV-Windows.zip" download>
+          <a className="tv-download-primary" href="/downloads/Blanco-TV-Windows.zip?v=1.3" download>
             <Download size={19} />
             {t('تحميل أداة Windows', 'Télécharger pour Windows')}
           </a>
@@ -55,7 +55,7 @@ export default function Downloads() {
           <div className="tv-download-icon">
             <Download size={28} />
           </div>
-          <span>ANDROID TV 8+ · APK</span>
+          <span>ANDROID TV 8+ · v1.3 · APK</span>
           <h2>{t('تطبيق التلفزيون', 'Application pour le téléviseur')}</h2>
           <p>
             {t(
@@ -63,7 +63,7 @@ export default function Downloads() {
               'Pour une installation manuelle sur le téléviseur. Ouvrez l’application et scannez le QR pour associer l’écran au compte administrateur Blanco.',
             )}
           </p>
-          <a className="tv-download-secondary" href="/downloads/blanco-tv-pilot.apk" download>
+          <a className="tv-download-secondary" href="/downloads/blanco-tv-pilot.apk?v=1.3" download>
             <Download size={19} />
             {t('تحميل تطبيق التلفزيون', 'Télécharger l’APK')}
           </a>
