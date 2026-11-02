@@ -32,5 +32,8 @@ jobs:
       - uses: android-actions/setup-android@v3
         with:
           packages: 'platform-tools platforms;android-34 build-tools;35.0.0'
+      - name: Test Windows installer orchestration
+        shell: pwsh
+        run: ./android-tv/installer/Test-Installer.ps1
       - run: android-tv/test.sh
       - run: android-tv/build.sh

@@ -35,3 +35,15 @@ Le planning utilise Europe/Paris. Écran noir, veille matérielle et coupure él
 `npm ci`, JDK 21, Android SDK platform 34 et build-tools 35.0.0. Définir ANDROID_SDK_ROOT, puis exécuter `android-tv/test.sh` et `android-tv/build.sh`. Le build génère le menu local et signe un APK pilote avec une clé de développement locale ignorée par Git. Conserver cette clé de manière privée si nécessaire pour mettre à jour le même pilote ; les builds CI produisent leur propre signature. Avant distribution durable, choisir et sauvegarder une clé de signature de production privée. Ne jamais publier cette clé dans Git.
 
 Tests : politiques PIN/planning Java, RPC/RLS PostgreSQL, interface et rendu hors connexion dans Chromium. Les commandes Android de verrouillage, veille, réveil, démarrage et lecture vidéo restent à vérifier sur le téléviseur.
+
+## أداة الكمبيوتر / Installation Windows
+
+تحميل الحزمة المحمولة: https://raw.githubusercontent.com/Hammo089/Menu/main/android-tv/dist/Blanco-TV-Windows.zip
+
+Windows 10/11: فك الضغط كاملاً وشغّل Start-Blanco.cmd. تحتوي الحزمة على APK وADB الرسمي، وتفحص بصمات الملفات قبل الاتصال. أدخل IP التلفزيون ومنفذ الاتصال إن كان مختلفاً عن 5555. إذا الجهاز يستخدم Wireless debugging، أدخل أيضاً منفذ الاقتران والكود الذي يعرضه Android. وافق على رسالة التفويض من التلفزيون. الأداة لا تحتاج صلاحيات Administrator على الكمبيوتر.
+
+تأخذ نسخة من قائمة الحزم والمشغّل السابق، تثبّت التطبيق وتفتحه، وتعيّنه Home حيث يدعم النظام. يمكنها محاولة Device Owner دون حذف حسابات أو إعادة ضبط؛ إذا رفض Android، يظهر بوضوح أن القفل الكامل لم يُفعّل. التطبيق لا يقفل الشاشة إلا بعد الربط وتحديد PIN خروج. امسح QR الظاهر على التلفزيون لفتح الإدارة مع رمز الاقتران جاهزاً؛ QR لا يتضمن PIN أو سر الجهاز. تسجيل دخول المالك مطلوب دائماً. رمز Android اللاسلكي ورمز اقتران Blanco مختلفان عن PIN الخروج.
+
+الحزمة لا تعطّل المشغّل الأصلي. فشل التثبيت يوقف الإعداد قبل تغيير Home أو Device Owner. إذا فشلت محاولة تشغيل التطبيق النهائية تحاول إعادة Home السابق. النسخ تحفظ في LOCALAPPDATA/BlancoTV/Backups. افصل الاتصال من الأداة وأغلق network debugging على التلفزيون بعد التجربة؛ إدارة المحل العادية لا تحتاج ADB. Windows قد يعرض تنبيهاً لأن السكريبت غير موقّع؛ لا تعطل الحماية الأمنية أو سياسات المؤسسة لتشغيله.
+
+تجارب الأداة تغطي قبول الجهاز، رفض Device Owner، فشل التثبيت والتشغيل، رفض التفويض، Android قديم، وإرجاع Home بعد فشل التشغيل النهائي. اختبار QR يفك الرمز الحقيقي ويتحقق من رابط الإدارة. التنفيذ على تلفزيون حقيقي وتجربة Windows الفعلية لم تتم بعد.

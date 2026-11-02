@@ -29,7 +29,10 @@ export default function ScreensAdmin() {
     [busy, setBusy] = useState(false);
   const [email, setEmail] = useState(''),
     [password, setPassword] = useState('');
-  const [code, setCode] = useState(''),
+  const [code, setCode] = useState(() => {
+      const value = new URLSearchParams(window.location.search).get('pair') || '';
+      return /^[A-Fa-f0-9]{10}$/.test(value) ? value.toUpperCase() : '';
+    }),
     [name, setName] = useState('Blanco TV'),
     [pin, setPin] = useState(''),
     [confirm, setConfirm] = useState('');
@@ -155,6 +158,13 @@ export default function ScreensAdmin() {
         <a className="button dark" href={APK}>
           <Download size={18} />{' '}
           {l('تنزيل تطبيق التلفزيون — نسخة تجريبية', 'Télécharger l’application TV — pilote')}
+        </a>
+        <a
+          className="button"
+          href="https://raw.githubusercontent.com/Hammo089/Menu/main/android-tv/dist/Blanco-TV-Windows.zip"
+        >
+          <Download size={18} />{' '}
+          {l('أداة التثبيت من الكمبيوتر — Windows', 'Installation depuis Windows')}
         </a>
       </section>
       {error && (

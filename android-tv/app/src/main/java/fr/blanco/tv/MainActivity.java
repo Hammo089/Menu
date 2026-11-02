@@ -173,6 +173,27 @@ public class MainActivity extends Activity {
       TextView number = text(code, 48, Color.rgb(30, 60, 46));
       number.setTextIsSelectable(true);
       panel.addView(number);
+      if (code.matches("[A-F0-9]{10}")) {
+        try {
+          web = new WebView(this);
+          web.setBackgroundColor(Color.TRANSPARENT);
+          web.getSettings().setJavaScriptEnabled(true);
+          web.getSettings().setAllowFileAccess(false);
+          web.getSettings().setAllowContentAccess(false);
+          web.getSettings().setBlockNetworkLoads(true);
+          web.setWebViewClient(
+              new WebViewClient() {
+                public boolean shouldOverrideUrlLoading(WebView v, WebResourceRequest r) {
+                  return true;
+                }
+              });
+          panel.addView(web, new LinearLayout.LayoutParams(dp(190), dp(190)));
+          web.loadUrl("file:///android_asset/pairing.html#" + code);
+        } catch (Exception unavailable) {
+          panel.addView(
+              text("Scannez indisponible : saisissez le code ci-dessus.", 16, Color.DKGRAY));
+        }
+      }
     }
     panel.addView(text(subtitle, 18, Color.DKGRAY));
     panel.addView(
@@ -608,7 +629,7 @@ public class MainActivity extends Activity {
             RuntimeState.owner(this)
                 ? "Kiosque administré / وضع مُدار"
                 : "Mode affichage : Home et les réglages système peuvent permettre de sortir.\n"
-                      + "قفل كامل غير مضمون بدون إدارة الجهاز.",
+                    + "قفل كامل غير مضمون بدون إدارة الجهاز.",
             16,
             Color.DKGRAY));
     panel.addView(

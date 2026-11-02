@@ -102,8 +102,8 @@ test('screen owner pairs with an offline exit PIN, publishes content and midnigh
     if (action === 'pin') result.saved = true;
     await r.fulfill({ json: result });
   });
-  await page.goto('http://127.0.0.1:5180/admin/screens');
-  await page.getByLabel('رمز الاقتران', { exact: true }).fill('A1B2C3D4E5');
+  await page.goto('http://127.0.0.1:5180/admin/screens?pair=A1B2C3D4E5');
+  await expect(page.getByLabel('رمز الاقتران', { exact: true })).toHaveValue('A1B2C3D4E5');
   await page.getByLabel('اسم الشاشة', { exact: true }).fill('Écran comptoir');
   await page.getByLabel('كود الخروج — من ٦ إلى ١٢ رقمًا', { exact: true }).fill('482951');
   await page.getByLabel('تأكيد كود الخروج', { exact: true }).fill('482951');
