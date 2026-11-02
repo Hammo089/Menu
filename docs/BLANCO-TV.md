@@ -1,11 +1,11 @@
-# Blanco TV 1.2 — وضع عرض اختياري / Affichage facultatif
+# Blanco TV 1.3 — وضع عرض اختياري / Affichage facultatif
 
 تنزيل: https://blanco-menu-one.vercel.app/telecharger
 إدارة: https://blanco-menu-one.vercel.app/admin/screens
 
 ## السلوك الحالي
 
-هذا تطبيق ملء الشاشة تفتحه يدوياً من تطبيقات التلفزيون. لا يحل مكان Fire TV ولا يشتغل تلقائياً عند الإقلاع. زر Home يبقى متاحاً، لذلك هذه النسخة ليست قفل كيوسك كامل. للخروج من داخل التطبيق: رجوع ثم PIN ثم «الرجوع للتلفزيون». إعادة تحميل من الإدارة لا تعيد فتح التطبيق بعد مغادرته. أوامر الطاقة معطلة في هذه النسخة، والجدول يحدد عرض المحتوى/الشاشة السوداء داخل التطبيق فقط.
+هذا تطبيق ملء الشاشة تفتحه يدوياً من تطبيقات التلفزيون. لا يحل مكان Fire TV. يطلب فتح Blanco عند الإقلاع الكامل عبر BOOT_COMPLETED، ويمكن تعطيل الخيار من قائمة PIN. Fire TV قد يمنع الطلب، ولذلك يلزم اختبار إعادة تشغيل فعلية. الاستيقاظ من السكون بزر الريموت ليس إقلاعاً كاملاً ولا يغطيه هذا الحدث. الخروج اليدوي يبقى فعالاً لباقي الجلسة ولا يعيد التطبيق فتح نفسه. زر Home يبقى متاحاً، لذلك هذه النسخة ليست قفل كيوسك كامل. للخروج من داخل التطبيق: رجوع ثم PIN ثم «الرجوع للتلفزيون». إعادة تحميل من الإدارة لا تعيد فتح التطبيق بعد مغادرته. أوامر الطاقة معطلة في هذه النسخة، والجدول يحدد عرض المحتوى/الشاشة السوداء داخل التطبيق فقط.
 
 ## أداة Windows
 
@@ -17,7 +17,7 @@
 
 ## Contenu / fonctionnement
 
-Ouvrir Blanco manuellement depuis les applications TV. Home reste utilisable. Retour + PIN ouvre «Retour à Fire TV». Pas de changement de lanceur, Device Owner, verrouillage système ou démarrage automatique. Le premier diagnostic Windows est en lecture seule ; l’installation est désactivée par défaut. Une installation existante de l’ancienne version administrée ne sera pas reconfigurée silencieusement.
+Ouvrir Blanco manuellement depuis les applications TV. Home reste utilisable. Retour + PIN ouvre «Retour à Fire TV». Pas de changement de lanceur, Device Owner, verrouillage système ou verrouillage permanent. Une ouverture est demandée après un démarrage complet via BOOT_COMPLETED, désactivable après saisie du PIN. Fire TV peut refuser ce lancement ; tester un véritable redémarrage. La sortie manuelle reste effective pendant la session. Le réveil de veille ne déclenche pas BOOT_COMPLETED. Le premier diagnostic Windows est en lecture seule ; l’installation est désactivée par défaut. Une installation existante de l’ancienne version administrée ne sera pas reconfigurée silencieusement.
 
 Menu et médias conservés hors ligne : dernière copie synchronisée, médias directs HTTPS de 25MB maximum, cache privé 200MB. Les pages externes nécessitent Internet. Le planning Europe/Paris, y compris minuit et changement d’heure, agit seulement pendant l’affichage Blanco. Le QR personnalisé non disponible est masqué dans le menu local plutôt que remplacé par un mauvais lien. Les effets saisonniers ne sont pas inclus hors ligne.
 

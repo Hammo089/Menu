@@ -1,4 +1,4 @@
-BLANCO TV - WINDOWS 10/11 - OPTIONAL DISPLAY 1.2
+BLANCO TV - WINDOWS 10/11 - OPTIONAL DISPLAY 1.3
 
 1. Extract ALL files, then double-click Start-Blanco.cmd.
 2. Put PC and TV on the same LAN. Enable ADB debugging on the TV.
@@ -11,9 +11,11 @@ BLANCO TV - WINDOWS 10/11 - OPTIONAL DISPLAY 1.2
 6. Scan the on-screen QR, sign in to Blanco administration and choose an exit PIN.
 7. Back -> enter PIN -> Retour a Fire TV returns to the normal TV interface.
    Home also remains available. This is fullscreen display, NOT a system lock.
-8. Open Blanco from your TV apps whenever you want the menu. It does not take
-   over startup or reopen itself after you exit. Remote reload/wake does not
-   bring it back from the background; power commands are disabled in this build.
+8. Blanco requests opening after a FULL TV boot, without changing the launcher.
+   Back + PIN opens a checkbox to disable/enable this. Exit returns to normal TV
+   for the current session. Remote reload/wake never forces the app back.
+   A real restart must be tested: Fire TV may block automatic launch. Standby
+   wake from the remote is NOT a full boot and is not covered by this trigger.
 9. Disconnect using the installer and disable network debugging after testing.
 
 Android 8+ with System WebView required. Fire OS 7 is based on Android 9;

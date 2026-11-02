@@ -99,8 +99,8 @@ export default function Downloads() {
         </ol>
         <p>
           {t(
-            'هذه النسخة وضع عرض اختياري وليست قفلاً كاملاً: زر Home يبقى متاحاً، والرجوع بالكود يفتح خيار العودة للتلفزيون. لا تغيير للمشغّل أو إدارة الجهاز أو التشغيل التلقائي. بعد الإعداد، افصل ADB وأغلق تصحيح الشبكة.',
-            'Affichage facultatif sans verrouillage système : Home reste disponible et le PIN ouvre le retour à la TV. Aucun changement de lanceur, de gestion de l’appareil ou de démarrage automatique. Déconnectez ADB et désactivez le débogage réseau après installation.',
+            'هذه النسخة وضع عرض اختياري وليست قفلاً كاملاً: زر Home يبقى متاحاً، والرجوع بالكود يفتح خيار العودة للتلفزيون. لا تغيير للمشغّل أو إدارة الجهاز، مع محاولة فتح Blanco بعد الإقلاع الكامل وخيار لتعطيلها من داخل التطبيق. بعد الإعداد، افصل ADB وأغلق تصحيح الشبكة.',
+            'Affichage facultatif sans verrouillage système : Home reste disponible et le PIN ouvre le retour à la TV. Aucun changement de lanceur, de gestion de l’appareil ; une ouverture est demandée après le démarrage complet, désactivable dans l’application. Déconnectez ADB et désactivez le débogage réseau après installation.',
           )}
         </p>
         <a href="/admin/screens">

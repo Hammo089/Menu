@@ -60,7 +60,8 @@ try {
     Write-Host "`nInstalled. Scan the QR on the TV, sign in to Blanco and choose your EXIT PIN." -ForegroundColor Green
     Write-Host 'The on-screen 10-character code is a pairing code, NOT your exit PIN.'
     Write-Host 'Optional display mode. Fire TV Home remains available. No full device lock enabled.' -ForegroundColor Green
-    Write-Host 'Open Blanco manually when needed. Back + your PIN opens Return to TV.'
+    Write-Host 'Blanco requests launch on full TV boot. Test a real restart; Fire TV may block auto-launch.'
+    Write-Host 'Back + PIN opens Return to TV and the auto-start on/off option. Home remains unchanged.'
     Write-Host "Backup: $backup"
     if ($result.PreviousHome) { Write-Host "Previous Home: $($result.PreviousHome) (saved for restoration)" }
     Start-Process 'https://blanco-menu-one.vercel.app/admin/screens'

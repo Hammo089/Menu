@@ -631,6 +631,18 @@ public class MainActivity extends Activity {
             "Mode affichage facultatif / وضع عرض اختياري — Home reste disponible",
             16,
             Color.DKGRAY));
+    CheckBox autoStart = new CheckBox(this);
+    autoStart.setText("Ouvrir au démarrage / فتح Blanco عند تشغيل الجهاز");
+    autoStart.setTextColor(Color.DKGRAY);
+    autoStart.setChecked(vault.read().optBoolean("autoStart", true));
+    autoStart.setOnCheckedChangeListener((button, checked) -> vault.put("autoStart", checked));
+    panel.addView(autoStart);
+    panel.addView(
+        text(
+            "Au démarrage complet ; la sortie reste disponible.\n"
+                + "بعد الإقلاع الكامل؛ الخروج يبقى متاحاً.",
+            14,
+            Color.DKGRAY));
     panel.addView(
         button(
             "Retour à Fire TV / الرجوع للتلفزيون",
