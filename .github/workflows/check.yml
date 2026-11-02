@@ -16,3 +16,19 @@ jobs:
       - run: npm run test:browser
         env:
           PLAYWRIGHT_CHROMIUM_EXECUTABLE: ''
+  android:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+      - run: npm ci
+      - run: sdkmanager 'platforms;android-34' 'build-tools;35.0.0'
+      - run: android-tv/test.sh
+      - run: android-tv/build.sh

@@ -424,6 +424,10 @@ export default function Admin() {
           ))}
         </nav>
         <div className="sidebar-bottom">
+          <a href="/admin/screens">
+            <Monitor size={17} />
+            {l('إدارة الشاشات', 'Gestion des écrans')}
+          </a>
           <a href="/admin/fidelite">
             <Coffee size={17} />
             {l('برنامج الولاء', 'Programme fidélité')}

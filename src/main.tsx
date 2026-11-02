@@ -6,10 +6,13 @@ import './styles.css';
 const Admin = lazy(() => import('./Admin'));
 const TVMenu = lazy(() => import('./TVMenu'));
 const CustomerLoyalty = lazy(() => import('./loyalty/Customer'));
+const ScreensAdmin = lazy(() => import('./screens/Admin'));
 const LoyaltyAdmin = lazy(() => import('./loyalty/Admin'));
 const path = window.location.pathname.replace(/\/$/, '') || '/';
 function App() {
-  if (['/fidelite', '/fidelite/confidentialite', '/admin/fidelite'].includes(path))
+  if (
+    ['/fidelite', '/fidelite/confidentialite', '/admin/fidelite', '/admin/screens'].includes(path)
+  )
     return (
       <Suspense
         fallback={
@@ -18,7 +21,13 @@ function App() {
           </div>
         }
       >
-        {path === '/admin/fidelite' ? <LoyaltyAdmin /> : <CustomerLoyalty />}
+        {path === '/admin/screens' ? (
+          <ScreensAdmin />
+        ) : path === '/admin/fidelite' ? (
+          <LoyaltyAdmin />
+        ) : (
+          <CustomerLoyalty />
+        )}
       </Suspense>
     );
   if (!['/', '/menu', '/tv', '/admin'].includes(path))

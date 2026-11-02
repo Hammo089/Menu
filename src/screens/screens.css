@@ -1,0 +1,359 @@
+.screen-admin {
+  min-height: 100vh;
+  background: #f6f5ef;
+  color: #223c32;
+  padding: 0 5vw 70px;
+  font-family: Montserrat, Arial, sans-serif;
+}
+.screen-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 22px 0;
+  border-bottom: 1px solid #d7ddd1;
+}
+.screen-header a,
+.screen-header > div {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.screen-admin button {
+  cursor: pointer;
+}
+.screen-admin button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.screen-header button,
+.screen-card header > button {
+  border: 1px solid #d5ddce;
+  border-radius: 10px;
+  background: white;
+  padding: 9px 13px;
+}
+.screen-brand {
+  font:
+    32px Georgia,
+    serif;
+}
+.screen-brand small {
+  font: 13px Montserrat;
+  letter-spacing: 2px;
+}
+.screen-hero {
+  max-width: 850px;
+  padding: 45px 0 35px;
+}
+.screen-hero > span,
+.screen-editor header span {
+  font-size: 11px;
+  letter-spacing: 3px;
+  color: #70836f;
+}
+.screen-hero h1 {
+  font:
+    clamp(30px, 4vw, 54px) Georgia,
+    serif;
+  margin: 12px 0;
+}
+.screen-hero p {
+  line-height: 1.9;
+  max-width: 720px;
+  margin-bottom: 20px;
+}
+.screen-card {
+  background: #fffefa;
+  border: 1px solid #dbe0d4;
+  border-radius: 22px;
+  padding: 26px;
+  margin-bottom: 22px;
+}
+.screen-card h2 {
+  font:
+    25px Georgia,
+    serif;
+  margin: 0 0 18px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.screen-card h3 {
+  font-size: 17px;
+  margin: 25px 0 16px;
+}
+.screen-card p {
+  font-size: 13px;
+  line-height: 1.9;
+  color: #6a786b;
+  margin: 10px 0 18px;
+}
+.screen-card label {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  font-size: 13px;
+  margin: 16px 0;
+}
+.screen-card input:not([type='checkbox']),
+.screen-card select {
+  width: 100%;
+  border: 1px solid #cdd6c7;
+  background: #fff;
+  border-radius: 10px;
+  padding: 12px 13px;
+  color: #223c32;
+  font: inherit;
+  min-width: 0;
+}
+.screen-card input:focus,
+.screen-card select:focus {
+  outline: 2px solid #9db5a0;
+  outline-offset: 2px;
+}
+.screen-card header {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  align-items: center;
+}
+.screen-card fieldset {
+  padding: 0;
+  margin: 0;
+  border: 0;
+  min-width: 0;
+}
+.screen-login {
+  max-width: 460px;
+}
+.screen-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+  margin-bottom: 26px;
+}
+.screen-stats > div {
+  background: #e9eee4;
+  padding: 22px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+.screen-stats strong {
+  font-size: 24px;
+}
+.screen-stats span {
+  font-size: 12px;
+}
+.screen-columns {
+  display: grid;
+  grid-template-columns: 310px minmax(0, 1fr);
+  gap: 26px;
+  align-items: start;
+}
+.screen-empty {
+  padding: 75px 35px;
+  text-align: center;
+}
+.screen-empty svg {
+  margin: 0 auto 24px;
+}
+.screen-empty h2 {
+  justify-content: center;
+}
+.screen-device {
+  display: flex;
+  width: 100%;
+  gap: 14px;
+  align-items: center;
+  text-align: start;
+  background: transparent;
+  border: 1px solid transparent;
+  padding: 15px 10px;
+  border-radius: 12px;
+}
+.screen-device.selected {
+  background: #e9eee3;
+  border-color: #b5c8b2;
+}
+.screen-device span {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+.screen-device small {
+  color: #72836e;
+}
+.screen-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+.screen-alert,
+.screen-notice {
+  padding: 15px 18px;
+  border-radius: 12px;
+  font-size: 14px;
+  line-height: 1.7;
+  margin-bottom: 20px;
+}
+.screen-alert {
+  background: #f8e7e1;
+  color: #7e3b2d;
+}
+.screen-notice {
+  background: #e1edde;
+  color: #315b3d;
+}
+.screen-meta {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin: 15px 0 20px;
+}
+.screen-meta span {
+  padding: 8px 11px;
+  background: #f0f2e9;
+  border-radius: 8px;
+  font-size: 11px;
+}
+.screen-day {
+  display: grid;
+  grid-template-columns: 1fr 120px 15px 120px;
+  gap: 12px;
+  align-items: center;
+  border-bottom: 1px solid #e7e9df;
+  padding: 6px 0;
+}
+.screen-card .screen-check {
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+}
+.screen-check input {
+  accent-color: #294f3b;
+  width: 18px;
+  height: 18px;
+}
+.screen-commands > div {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.screen-editor > section,
+.screen-editor fieldset > section {
+  padding: 10px 0 18px;
+  border-bottom: 1px solid #e0e5d9;
+}
+.screen-item {
+  display: grid;
+  grid-template-columns: 100px 1fr 90px 55px;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 12px;
+}
+.screen-item label {
+  margin: 0;
+}
+.screen-item > button {
+  background: none;
+  color: #8c5445;
+  border: 0;
+  font-size: 12px;
+}
+.screen-history {
+  list-style: none;
+  padding: 0;
+}
+.screen-history li {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  padding: 14px 0;
+  border-bottom: 1px solid #e6e9e0;
+  font-size: 12px;
+}
+.screen-history small {
+  width: 100%;
+  color: #788171;
+}
+.screen-danger {
+  padding: 12px;
+  border: 1px solid #d6b8ae;
+  color: #8d4635;
+  background: #fff9f5;
+  border-radius: 10px;
+  margin-top: 25px;
+}
+.screen-admin .button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+.screen-card > form button {
+  width: 100%;
+}
+@media (max-width: 950px) {
+  .screen-columns {
+    grid-template-columns: 1fr;
+  }
+  .screen-columns > aside {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+  .screen-card {
+    padding: 20px;
+  }
+  .screen-item {
+    grid-template-columns: 90px 1fr;
+  }
+  .screen-day {
+    grid-template-columns: 1fr 100px 12px 100px;
+    gap: 6px;
+  }
+}
+@media (max-width: 600px) {
+  .screen-admin {
+    padding: 0 18px 40px;
+  }
+  .screen-columns > aside {
+    display: block;
+  }
+  .screen-stats {
+    grid-template-columns: 1fr;
+  }
+  .screen-fields {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+  .screen-header a {
+    font-size: 11px;
+  }
+  .screen-brand {
+    font-size: 24px;
+  }
+  .screen-card header {
+    align-items: start;
+    flex-direction: column;
+  }
+  .screen-day {
+    grid-template-columns: 1fr 92px 10px 92px;
+  }
+  .screen-day label {
+    font-size: 11px;
+  }
+  .screen-day input[type='time'] {
+    padding: 10px 5px;
+  }
+  .screen-hero {
+    padding-top: 28px;
+  }
+  .screen-item {
+    grid-template-columns: 80px 1fr;
+  }
+}

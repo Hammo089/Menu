@@ -3289,3 +3289,7 @@ html {
 .tv-loyalty {
   overflow: hidden;
 }
+
+.tv-controls[hidden] {
+  display: none !important;
+}

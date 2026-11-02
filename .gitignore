@@ -27,3 +27,10 @@ marketing-reel/composition/node_modules/
 marketing-reel/check.log
 marketing-reel/snapshot.log
 marketing-reel/peaks.log
+
+# Android TV build state, local pairing diagnostics and signing identities
+android-tv/build/
+android-tv/.signing/
+android-tv/app/src/main/assets/offline-menu.html
+android-tv/backup/
+android-tv/local.properties

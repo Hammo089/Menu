@@ -109,6 +109,8 @@ export function tvTextLayer(svg: string) {
 }
 export default function TVMenu() {
   const { menu } = useMenu();
+  const managedParams = new URLSearchParams(window.location.search);
+  const managed = managedParams.get('managed') === '1';
   const container = useRef<HTMLDivElement>(null);
   const [fullscreen, setFullscreen] = useState(false);
   const [controls, setControls] = useState(true);
@@ -133,8 +135,15 @@ export default function TVMenu() {
     },
   );
   const loyalty = tvLoyaltySettings(menu.settings.tvLoyalty);
-  const orientation = device.tvOrientation || menu.settings.tvOrientation;
-  const rotation = device.tvRotation ?? menu.settings.tvRotation;
+  const managedOrientation = managed ? managedParams.get('orientation') : null;
+  const orientation =
+    managedOrientation === 'portrait' || managedOrientation === 'landscape'
+      ? managedOrientation
+      : device.tvOrientation || menu.settings.tvOrientation;
+  const managedRotation = managed ? Number(managedParams.get('rotation')) : NaN;
+  const rotation = [0, 90, 180, 270].includes(managedRotation)
+    ? managedRotation
+    : (device.tvRotation ?? menu.settings.tvRotation);
   const ratio = orientation === 'portrait' ? 9 / 16 : 16 / 9;
   const rotated = rotation === 90 || rotation === 270;
   const availableWidth = rotated ? viewport.height : viewport.width;
@@ -246,7 +255,8 @@ export default function TVMenu() {
         <Promotion products={menu.products} settings={menu.settings} />
       </div>
       <div
-        className={`tv-controls ${controls || panel ? 'visible' : ''}`}
+        className={`tv-controls ${!managed && (controls || panel) ? 'visible' : ''}`}
+        hidden={managed}
         onFocus={() => setControls(true)}
       >
         <button onClick={() => setPanel(!panel)} aria-label="إعدادات الشاشة / Réglages de l’écran">
@@ -256,7 +266,7 @@ export default function TVMenu() {
           {fullscreen ? <Minimize /> : <Maximize />}
         </button>
       </div>
-      {panel && (
+      {!managed && panel && (
         <section
           className="tv-settings"
           dir="rtl"
