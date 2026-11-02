@@ -109,7 +109,8 @@ public class MainActivity extends Activity {
     RuntimeState.displayActive = false;
     if (next != null) ui.removeCallbacks(next);
     if (video != null && video.isPlaying()) video.pause();
-    if (web != null) web.onPause();
+    if (!manager) clearPlayer();
+    else if (web != null) web.onPause();
     super.onPause();
   }
 
@@ -338,8 +339,11 @@ public class MainActivity extends Activity {
                 File file = cache.get(url, refreshCache);
                 ui.post(
                     () -> {
-                      if (ticket != sequence || !url.equals(itemKey) || manager || showingBlack)
-                        return;
+                      if (ticket != sequence
+                          || !RuntimeState.displayActive
+                          || !url.equals(itemKey)
+                          || manager
+                          || showingBlack) return;
                       player.removeAllViews();
                       if (type.equals("video")) {
                         video = new VideoView(this);
@@ -358,7 +362,8 @@ public class MainActivity extends Activity {
                             });
                         video.setOnPreparedListener(
                             v -> {
-                              if (!showingBlack) video.start();
+                              if (RuntimeState.displayActive && !showingBlack && video != null)
+                                video.start();
                             });
                       } else {
                         try {
