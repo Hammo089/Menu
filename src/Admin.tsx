@@ -22,6 +22,7 @@ import {
   ShieldCheck,
   Trash2,
   Upload,
+  Users,
   X,
 } from 'lucide-react';
 import { useMenu } from './store';
@@ -416,6 +417,10 @@ export default function Admin() {
         </a>
         <span className="sidebar-caption">{l('لوحة التحكم', 'ESPACE DE GESTION')}</span>
         <nav>
+          <button type="button" onClick={() => window.location.assign('/admin/personnel')}>
+            <Users size={19} />
+            {l('إدارة الموظفين', 'Gestion du personnel')}
+          </button>
           {navigation.map(({ id, icon: Icon }) => (
             <button key={id} className={tab === id ? 'active' : ''} onClick={() => setTab(id)}>
               <Icon size={19} />
@@ -424,10 +429,6 @@ export default function Admin() {
           ))}
         </nav>
         <div className="sidebar-bottom">
-          <a href="/admin/personnel">
-            <Coffee size={17} />
-            {l('الموظفون وساعات العمل', 'Gestion du personnel')}
-          </a>
           <a href="/admin/screens">
             <Monitor size={17} />
             {l('إدارة الشاشات', 'Gestion des écrans')}
