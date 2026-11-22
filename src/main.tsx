@@ -7,10 +7,24 @@ const Admin = lazy(() => import('./Admin'));
 const TVMenu = lazy(() => import('./TVMenu'));
 const CustomerLoyalty = lazy(() => import('./loyalty/Customer'));
 const Downloads = lazy(() => import('./screens/Downloads'));
+const Personnel = lazy(() => import('./personnel/App'));
+const PersonnelPrivacy = lazy(() => import('./personnel/Privacy'));
 const ScreensAdmin = lazy(() => import('./screens/Admin'));
 const LoyaltyAdmin = lazy(() => import('./loyalty/Admin'));
 const path = window.location.pathname.replace(/\/$/, '') || '/';
 function App() {
+  if (['/admin/personnel', '/equipe', '/equipe/confidentialite'].includes(path))
+    return (
+      <Suspense
+        fallback={
+          <div className="loading-screen">
+            Blanco<span>Un petit instant…</span>
+          </div>
+        }
+      >
+        {path === '/equipe/confidentialite' ? <PersonnelPrivacy /> : <Personnel />}
+      </Suspense>
+    );
   if (path === '/telecharger')
     return (
       <Suspense fallback={<div className="loading-screen">Blanco</div>}>

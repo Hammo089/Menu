@@ -84,3 +84,13 @@ Node 22+, Chromium and FFmpeg are required. The video CLI is pinned to 0.8.192.
 The MP4 includes a music credit; preserve the credit when sharing or changing it.
 
 A second project-scoped skill, [hyperframes-motion-reel](https://github.com/Sunwood-ai-labs/hyperframes-motion-reel-skill), is installed in `.agents/skills/hyperframes-motion-reel/`. The25-second French customer marketing film is in `marketing-reel/`, with original code-generated music,60fps editable composition, pastry illustration and source credits. It preserves the first film.
+
+## Gestion du personnel
+
+L’espace `/admin/personnel` utilise les comptes administrateurs Blanco existants.
+Le portail `/equipe` utilise un lien individuel et un PIN. Les salariés proposent
+leurs horaires dans un calendrier tactile ; seule la direction les approuve.
+Les corrections conservent les heures approuvées jusqu’à validation. PDF et Excel,
+rapports versionnés, dossiers, documents privés, absences par période et export
+JSON sont inclus. Voir [le guide personnel](docs/PERSONNEL.md) pour les migrations,
+les règles de calcul Europe/Paris, la confidentialité et l’exploitation.
