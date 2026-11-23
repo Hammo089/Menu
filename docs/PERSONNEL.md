@@ -39,3 +39,11 @@ Le propriétaire définit les personnes autorisées et les durées de conservati
 
 `npm test`, `npm run build`, `npx playwright test`.
 Tests spécifiques : droits et isolation PostgreSQL/PGlite, approbation et corrections, sessions révoquées, archivage immutable, minute précise, minuit/semaines/mois, DST, années bissextiles et jours fériés. Le test navigateur utilise le vrai RPC sur PGlite pour le parcours salarié → direction → PDF/Excel et une vue mobile.
+
+## Programme hebdomadaire et WhatsApp
+
+Dans chaque fiche, le tab Programme hebdomadaire est réservé à la direction. Choisir le lundi, remplir les sept journées, enregistrer puis sélectionner PDF ou Excel. Les dates sont générées et les chevauchements refusés, y compris avec les semaines voisines. Les modifications concurrentes exigent un rechargement. Le planning est prévisionnel : il n’ajoute aucune ligne aux heures réellement déclarées ni aux relevés comptables. Son total correspond aux postes dont la prise de poste commence dans cette semaine.
+
+Le bouton Partager sur WhatsApp utilise le partage natif de fichiers quand disponible : le responsable choisit WhatsApp. Sinon le fichier est téléchargé et une conversation wa.me s’ouvre avec le programme prérempli ; joindre manuellement le fichier. Le numéro principal de la fiche est utilisé (préfixe France pour un numéro national), sinon choisir le contact dans WhatsApp. Le responsable confirme toujours l’envoi. Aucun PIN, lien d’invitation, contact d’urgence ou donnée de contrat n’est partagé. Aucun envoi automatique, API WhatsApp payante ou service tiers n’est ajouté.
+
+Les plannings sont stockés dans hr_weekly_plans avec RLS et contrôle propriétaire, et inclus dans l’export JSON du site. Migration : 20261123145935_personnel_weekly_planning.sql.

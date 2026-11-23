@@ -25,18 +25,27 @@ async function setup() {
       'utf8',
     ),
   );
+  await db.exec(
+    readFileSync(
+      new URL(
+        '../../supabase/migrations/20261123145935_personnel_weekly_planning.sql',
+        import.meta.url,
+      ),
+      'utf8',
+    ),
+  );
   let queue = Promise.resolve();
   const files = new Map<string, Buffer>();
-  const rpc = (action: string, payload: any, admin = false) => {
+  const rpc = (action: string, payload: any, admin = false, weekly = false) => {
     const work = queue.then(async () => {
       await db.exec('reset role');
       await db.query("select set_config('request.jwt.claim.sub',$1,false)", [admin ? owner : '']);
       await db.exec('set role ' + (admin ? 'authenticated' : 'anon'));
       return (
-        await db.query('select public.personnel_api($1,$2::jsonb) result', [
-          action,
-          JSON.stringify(payload),
-        ])
+        await db.query(
+          `select public.${weekly ? 'personnel_planning' : 'personnel_api'}($1,$2::jsonb) result`,
+          [action, JSON.stringify(payload)],
+        )
       ).rows[0].result;
     });
     queue = work.then(
@@ -69,13 +78,17 @@ async function setup() {
     await context.route('https://blanco-test.supabase.co/**', async (route) => {
       const request = route.request(),
         url = request.url();
-      if (url.includes('/rest/v1/rpc/personnel_api')) {
+      if (
+        url.includes('/rest/v1/rpc/personnel_api') ||
+        url.includes('/rest/v1/rpc/personnel_planning')
+      ) {
         const body = request.postDataJSON();
         try {
           const result = await rpc(
             body.action,
             body.payload,
             request.headers().authorization === 'Bearer fake-owner-token',
+            url.includes('/personnel_planning'),
           );
           await route.fulfill({ json: result });
         } catch (e) {
@@ -259,6 +272,87 @@ test('a slow private month response cannot repopulate the page after owner logou
     await expect(p.locator('.hr-day-editor')).toHaveCount(0);
   } finally {
     release();
+    await context.close();
+    await h.db.close();
+  }
+});
+
+test('manager saves a weekly plan, exports PDF/Excel and opens WhatsApp without approving actual hours', async ({
+  browser,
+}) => {
+  test.setTimeout(120000);
+  const h = await setup(),
+    context = await browser.newContext({ viewport: { width: 390, height: 844 } });
+  await h.routes(context, true);
+  const p = await context.newPage();
+  try {
+    await p.goto('http://127.0.0.1:5180/admin/personnel');
+    await expect(p.locator('.hr-day-editor')).toBeVisible();
+    await p.getByRole('button', { name: 'Programme hebdomadaire', exact: true }).click();
+    await p.getByLabel('Semaine du lundi', { exact: true }).fill('2026-11-23');
+    await expect(p.getByLabel('Statut — 2026-11-23')).toBeEnabled();
+    await p.getByLabel('Statut — 2026-11-23').selectOption('work');
+    await p.getByLabel('Arrivée 2026-11-23 — heure', { exact: true }).selectOption('10');
+    await p.getByLabel('Départ 2026-11-23 — heure', { exact: true }).selectOption('18');
+    await p.getByLabel('Statut — 2026-11-24').selectOption('rest');
+    await p.getByLabel('Consigne pour la semaine').fill('Préparer les boissons.');
+    await p.getByRole('button', { name: 'Enregistrer le programme', exact: true }).click();
+    await expect(p.getByText(/Programme hebdomadaire enregistré/)).toBeVisible();
+    const [pdf] = await Promise.all([
+      p.waitForEvent('download'),
+      p.getByRole('button', { name: 'Télécharger PDF', exact: true }).click(),
+    ]);
+    expect(
+      (await PDFDocument.load(readFileSync((await pdf.path())!))).getPageCount(),
+    ).toBeGreaterThan(0);
+    await p.getByLabel('Format du programme').selectOption('xlsx');
+    const [xls] = await Promise.all([
+      p.waitForEvent('download'),
+      p.getByRole('button', { name: 'Télécharger Excel', exact: true }).click(),
+    ]);
+    expect(
+      readFileSync((await xls.path())!)
+        .slice(0, 2)
+        .toString(),
+    ).toBe('PK');
+    const link = await p
+      .getByRole('link', { name: 'Ouvrir directement la conversation WhatsApp' })
+      .getAttribute('href');
+    expect(link).toMatch(/^https:\/\/wa\.me\//);
+    expect(decodeURIComponent(link!)).toContain('Planning prévisionnel');
+    expect(decodeURIComponent(link!)).not.toContain('invitation=');
+    await context.route('https://wa.me/**', (route) =>
+      route.fulfill({ contentType: 'text/html', body: '<p>WhatsApp compose preview</p>' }),
+    );
+    await p.evaluate(() =>
+      Object.defineProperty(navigator, 'canShare', { configurable: true, value: () => false }),
+    );
+    const [attachment, conversation] = await Promise.all([
+      p.waitForEvent('download'),
+      context.waitForEvent('page'),
+      p.getByRole('button', { name: 'Partager sur WhatsApp', exact: true }).click(),
+    ]);
+    expect(attachment.suggestedFilename()).toMatch(/\.xlsx$/);
+    await conversation.waitForURL('https://wa.me/**');
+    await conversation.close();
+    await p.evaluate(() => {
+      Object.defineProperty(navigator, 'canShare', { configurable: true, value: () => true });
+      Object.defineProperty(navigator, 'share', {
+        configurable: true,
+        value: async (data: any) => {
+          (window as any).__sharedPlanning = data.files[0].name;
+        },
+      });
+    });
+    await p.getByRole('button', { name: 'Partager sur WhatsApp', exact: true }).click();
+    expect(await p.evaluate(() => (window as any).__sharedPlanning)).toMatch(/\.xlsx$/);
+    await p.reload();
+    await expect(p.locator('.hr-day-editor')).toBeVisible();
+    await p.getByRole('button', { name: 'Programme hebdomadaire', exact: true }).click();
+    await expect(p.getByLabel('Statut — 2026-11-23')).toHaveValue('work');
+    expect((await h.rpc('export_backup', {}, true)).days.length).toBe(0);
+    await p.screenshot({ path: 'test-results/planning-mobile.png', fullPage: true });
+  } finally {
     await context.close();
     await h.db.close();
   }

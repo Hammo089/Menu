@@ -3,6 +3,7 @@ export async function personnel(action: string, payload: Record<string, unknown>
   if (!supabase) throw new Error('Connexion au serveur indisponible.');
   const { data, error } = await supabase.rpc('personnel_api', { action, payload });
   if (error || data?.error) throw new Error(error?.message || data.error);
+  if (action === 'export_backup') return { ...data, ...(await planning('backup')) };
   return data;
 }
 export const randomKey = () =>
@@ -16,4 +17,11 @@ export function download(blob: Blob, name: string) {
   a.download = name;
   a.click();
   setTimeout(() => URL.revokeObjectURL(u), 1000);
+}
+
+export async function planning(action: string, payload: Record<string, unknown> = {}) {
+  if (!supabase) throw new Error('Connexion au serveur indisponible.');
+  const { data, error } = await supabase.rpc('personnel_planning', { action, payload });
+  if (error || data?.error) throw new Error(error?.message || data.error);
+  return data;
 }

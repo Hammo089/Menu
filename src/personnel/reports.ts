@@ -260,6 +260,9 @@ export function excel(report: Report) {
     ['Les écarts ne sont pas automatiquement des heures supplémentaires.'],
     ['Les heures traversant minuit sont ventilées dans les totaux au mois réel.'],
   ];
+  return spreadsheet(rows);
+}
+export function spreadsheet(rows: unknown[][], sheetName = 'Heures validées') {
   const column = (n: number) => {
     let s = '';
     for (n++; n > 0; n = Math.floor((n - 1) / 26)) s = String.fromCharCode(65 + ((n - 1) % 26)) + s;
@@ -272,7 +275,9 @@ export function excel(report: Report) {
     '_rels/.rels':
       '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>',
     'xl/workbook.xml':
-      '<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets><sheet name="Heures validées" sheetId="1" r:id="rId1"/></sheets></workbook>',
+      '<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets><sheet name="' +
+      xml(sheetName) +
+      '" sheetId="1" r:id="rId1"/></sheets></workbook>',
     'xl/_rels/workbook.xml.rels':
       '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/></Relationships>',
     'xl/worksheets/sheet1.xml': sheet,

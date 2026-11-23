@@ -5,6 +5,7 @@ import { personnel, randomKey, download } from './api';
 import { Calendar, MonthPicker } from './Calendar';
 import DayEditor from './DayEditor';
 import Profile from './Profile';
+import WeeklyPlanner from './WeeklyPlanner';
 import Access from './Access';
 import Absence from './Absence';
 import {
@@ -499,7 +500,7 @@ export default function PersonnelApp() {
                   : 'Déclarez, vérifiez et préparez les relevés de votre équipe.'}
               </p>
             </div>
-            <MonthPicker month={month} onChange={chooseMonth} />
+            {tab !== 'planning' && <MonthPicker month={month} onChange={chooseMonth} />}
           </div>
           {error && (
             <p role="alert" className="hr-error">
@@ -641,6 +642,7 @@ export default function PersonnelApp() {
                   <nav className="hr-tabs" aria-label="Dossier employé">
                     {[
                       ['hours', 'Horaires'],
+                      ['planning', 'Programme hebdomadaire'],
                       ['profile', 'Informations'],
                       ['access', 'Accès salarié'],
                       ['documents', 'Documents'],
@@ -759,6 +761,16 @@ export default function PersonnelApp() {
                       Actualiser les horaires
                     </button>
                   </>
+                ) : tab === 'planning' ? (
+                  <WeeklyPlanner
+                    key={employee.id}
+                    employee={employee}
+                    initialDate={date}
+                    onDirty={(v) => {
+                      dirty.current = v;
+                    }}
+                    onBusy={setBusy}
+                  />
                 ) : tab === 'profile' ? (
                   <Profile
                     key={employee.id + employee.version}

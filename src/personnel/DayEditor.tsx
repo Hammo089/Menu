@@ -10,7 +10,7 @@ import {
   type Hours,
   type Kind,
 } from './core';
-function Clock({
+export function Clock({
   label,
   value,
   onChange,

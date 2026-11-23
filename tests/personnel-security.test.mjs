@@ -27,6 +27,22 @@ test('personnel: scoped PIN sessions, private profiles, approval revisions, cale
       'utf8',
     ),
   );
+  await db.exec(
+    readFileSync(
+      new URL(
+        '../supabase/migrations/20261123145935_personnel_weekly_planning.sql',
+        import.meta.url,
+      ),
+      'utf8',
+    ),
+  );
+  const planRpc = async (action, payload = {}) =>
+    (
+      await db.query('select public.personnel_planning($1,$2::jsonb) result', [
+        action,
+        JSON.stringify(payload),
+      ])
+    ).rows[0].result;
   const role = async (id) => {
     await db.exec('reset role');
     await db.query("select set_config('request.jwt.claim.sub',$1,false)", [id || '']);
@@ -298,6 +314,49 @@ test('personnel: scoped PIN sessions, private profiles, approval revisions, cale
     june.days.every(
       (d) => d.employee_id === b && d.approved === null && d.proposal_state === 'pending',
     ),
+  );
+  await role(owner);
+  await role();
+  await assert.rejects(planRpc('get', { employeeId: a, week: '2026-11-23' }), /réservé/);
+  await role(owner);
+  const dayCount = (await rpc('export_backup')).days.length;
+  const planDays = Array.from({ length: 7 }, (_, i) => ({
+    date: 'forged-date',
+    hours:
+      i === 0
+        ? { ...hours, breakStart: '', breakEnd: '', arrival: '09:00', departure: '17:00' }
+        : null,
+  }));
+  const plan = (
+    await planRpc('save', {
+      employeeId: a,
+      week: '2026-11-23',
+      version: 0,
+      days: planDays,
+      note: 'Planning test',
+    })
+  ).plan;
+  assert.equal(plan.version, 1);
+  assert.equal(plan.days[0].date, '2026-11-23');
+  assert.equal(plan.days[0].hours.minutes, 480);
+  assert.equal(
+    (await rpc('export_backup')).days.length,
+    dayCount,
+    'Planned shifts must never create actual work records',
+  );
+  await assert.rejects(
+    planRpc('save', { employeeId: a, week: '2026-11-23', version: 0, days: planDays }),
+    /ailleurs/,
+  );
+  await assert.rejects(
+    planRpc('save', { employeeId: a, week: '2026-11-24', version: 0, days: planDays }),
+    /lundi/,
+  );
+  assert.equal((await planRpc('backup')).weeklyPlans.length, 1);
+  await role();
+  await assert.rejects(
+    planRpc('save', { employeeId: a, week: '2026-11-23', version: 1, days: planDays, session: sb }),
+    /réservé/,
   );
   await role(owner);
   const backup = await rpc('export_backup');
